@@ -4,20 +4,48 @@ import "./App.css";
 
 const recipes = [
   { id: 1, title: "Smoky chickpea stew", author: "Meera P.", rating: 4.8, reviews: 212, time: 35, diet: "Vegan", cuisine: "Indian", color: "peach", tags: ["comfort", "stew"] },
-  { id: 2, title: "Lemon herb gnocchi", author: "Luca B.", rating: 4.6, reviews: 98, time: 30, diet: "Veg", cuisine: "Italian", color: "sage", tags: ["pasta", "lemon"] },
+  { id: 2, title: "Lemon herb gnocchi", author: "Luca B.", rating: 4.6, reviews: 98, time: 30, diet: "Veg", cuisine: "Italian", difficulty: "Medium", color: "sage", tags: ["pasta", "lemon"] },
   { id: 3, title: "Coconut dal with greens", author: "Anika K.", rating: 4.9, reviews: 340, time: 40, diet: "Vegan", cuisine: "Indian", color: "gold", tags: ["dal", "coconut"] },
   { id: 4, title: "Charred corn tacos", author: "Diego R.", rating: 4.5, reviews: 76, time: 25, diet: "Vegan", cuisine: "Mexican", color: "sage", tags: ["corn", "tacos"] },
   { id: 5, title: "Miso sesame noodles", author: "Hana T.", rating: 4.7, reviews: 154, time: 20, diet: "Vegan", cuisine: "Thai", color: "sage", tags: ["noodles", "sesame"] },
   { id: 6, title: "Roasted tomato soup", author: "Sam W.", rating: 4.4, reviews: 61, time: 45, diet: "Vegan", cuisine: "Italian", color: "peach", tags: ["tomato", "soup"] },
   { id: 7, title: "Thai basil tofu", author: "Nok S.", rating: 4.7, reviews: 129, time: 25, diet: "Vegan", cuisine: "Thai", color: "gold", tags: ["tofu", "basil"] },
   { id: 8, title: "Zucchini fritters", author: "Eli M.", rating: 4.3, reviews: 44, time: 30, diet: "Veg", cuisine: "Italian", color: "peach", tags: ["zucchini", "quick"] },
-  { id: 9, title: "Creamy mushroom pasta", author: "Luca B.", rating: 4.8, reviews: 183, time: 35, diet: "Veg", cuisine: "Italian", color: "gold", tags: ["pasta", "mushroom"] },
+  { id: 9, title: "Creamy mushroom pasta", author: "Luca B.", rating: 4.8, reviews: 183, time: 35, diet: "Veg", cuisine: "Italian", difficulty: "Medium", color: "gold", tags: ["pasta", "mushroom"] },
   { id: 10, title: "Green goddess bowl", author: "Meera P.", rating: 4.6, reviews: 87, time: 15, diet: "Vegan", cuisine: "Indian", color: "sage", tags: ["salad", "greens"] },
   { id: 11, title: "Crispy tofu rice bowl", author: "Nok S.", rating: 4.9, reviews: 201, time: 30, diet: "Vegan", cuisine: "Thai", color: "peach", tags: ["tofu", "rice"] },
   { id: 12, title: "Roasted pepper tacos", author: "Diego R.", rating: 4.5, reviews: 69, time: 25, diet: "Vegan", cuisine: "Mexican", color: "gold", tags: ["pepper", "tacos"] },
+  { id: 13, title: "Ginger miso ramen", author: "Yuki N.", rating: 4.8, reviews: 176, time: 35, diet: "Vegan", cuisine: "Japanese", color: "peach", tags: ["ramen", "miso"] },
+  { id: 14, title: "Greek chickpea salad", author: "Sofia D.", rating: 4.7, reviews: 112, time: 15, diet: "Vegan", cuisine: "Mediterranean", color: "sage", tags: ["chickpea", "salad"] },
+  { id: 15, title: "Sesame broccoli noodles", author: "Wei L.", rating: 4.6, reviews: 94, time: 20, diet: "Vegan", cuisine: "Chinese", color: "gold", tags: ["noodles", "broccoli"] },
+  { id: 16, title: "Rainbow bibimbap", author: "Jisoo H.", rating: 4.9, reviews: 208, time: 40, diet: "Veg", cuisine: "Korean", color: "peach", tags: ["rice", "vegetables"] },
+  { id: 17, title: "Provençal ratatouille", author: "Camille R.", rating: 4.8, reviews: 143, time: 50, diet: "Vegan", cuisine: "French", color: "sage", tags: ["tomato", "zucchini"] },
+  { id: 18, title: "Paneer tikka wraps", author: "Riya S.", rating: 4.7, reviews: 121, time: 30, diet: "Veg", cuisine: "Indian", color: "gold", tags: ["paneer", "wraps"] },
+  { id: 19, title: "Lemony pesto orzo", author: "Luca B.", rating: 4.6, reviews: 89, time: 25, diet: "Veg", cuisine: "Italian", color: "peach", tags: ["pesto", "orzo"] },
+  { id: 20, title: "Thai peanut curry", author: "Nok S.", rating: 4.8, reviews: 157, time: 35, diet: "Vegan", cuisine: "Thai", color: "gold", tags: ["peanut", "curry"] },
+  { id: 21, title: "Black bean enchiladas", author: "Diego R.", rating: 4.7, reviews: 134, time: 45, diet: "Veg", cuisine: "Mexican", color: "sage", tags: ["beans", "enchiladas"] },
+  { id: 22, title: "Spinach shakshuka", author: "Sofia D.", rating: 4.8, reviews: 102, time: 30, diet: "Veg", cuisine: "Mediterranean", color: "peach", tags: ["eggs", "spinach"] },
+  { id: 23, title: "Salmon teriyaki bowl", author: "Yuki N.", rating: 4.9, reviews: 231, time: 25, diet: "Keto", cuisine: "Japanese", color: "gold", tags: ["salmon", "teriyaki"] },
+  { id: 24, title: "Kimchi tofu stew", author: "Jisoo H.", rating: 4.8, reviews: 166, time: 35, diet: "Vegan", cuisine: "Korean", color: "peach", tags: ["kimchi", "tofu"] },
+  { id: 25, title: "Cauliflower tikka traybake", author: "Meera P.", rating: 4.6, reviews: 83, time: 40, diet: "Vegan", cuisine: "Indian", color: "sage", tags: ["cauliflower", "tikka"] },
+  { id: 26, title: "Wild mushroom galette", author: "Camille R.", rating: 4.7, reviews: 97, time: 55, diet: "Veg", cuisine: "French", color: "gold", tags: ["mushroom", "pastry"] },
+  { id: 27, title: "Halloumi grain bowls", author: "Sofia D.", rating: 4.6, reviews: 78, time: 30, diet: "Veg", cuisine: "Mediterranean", color: "sage", tags: ["halloumi", "grain"] },
+  { id: 28, title: "Scallion egg fried rice", author: "Wei L.", rating: 4.5, reviews: 116, time: 20, diet: "Veg", cuisine: "Chinese", color: "peach", tags: ["rice", "egg"] },
+  { id: 29, title: "Spinach and ricotta ravioli", author: "Luca B.", rating: 4.9, reviews: 74, time: 75, diet: "Veg", cuisine: "Italian", difficulty: "Hard", color: "gold", tags: ["pasta", "spinach", "ricotta"] },
+  { id: 30, title: "Baked eggplant parmesan", author: "Luca B.", rating: 4.8, reviews: 126, time: 55, diet: "Veg", cuisine: "Italian", difficulty: "Medium", color: "peach", tags: ["eggplant", "tomato", "cheese"] },
+  { id: 31, title: "Paneer pepper skillet", author: "Riya S.", rating: 4.7, reviews: 91, time: 25, diet: "Keto", cuisine: "Indian", difficulty: "Easy", color: "gold", tags: ["paneer", "pepper", "quick"] },
+  { id: 32, title: "Avocado black bean tostadas", author: "Diego R.", rating: 4.8, reviews: 107, time: 20, diet: "Vegan", cuisine: "Mexican", difficulty: "Easy", color: "sage", tags: ["avocado", "beans", "quick"] },
+  { id: 33, title: "Thai vegetable curry", author: "Nok S.", rating: 4.7, reviews: 118, time: 45, diet: "Veg", cuisine: "Thai", difficulty: "Medium", color: "peach", tags: ["curry", "vegetables", "coconut"] },
+  { id: 34, title: "Miso glazed aubergine", author: "Yuki N.", rating: 4.8, reviews: 96, time: 35, diet: "Vegan", cuisine: "Japanese", difficulty: "Medium", color: "gold", tags: ["aubergine", "miso"] },
+  { id: 35, title: "Lemon herb chicken traybake", author: "Sofia D.", rating: 4.8, reviews: 145, time: 50, diet: "Keto", cuisine: "Mediterranean", difficulty: "Easy", color: "sage", tags: ["chicken", "lemon", "herbs"] },
+  { id: 36, title: "Vegetable mapo tofu", author: "Wei L.", rating: 4.7, reviews: 88, time: 30, diet: "Vegan", cuisine: "Chinese", difficulty: "Hard", color: "peach", tags: ["tofu", "chili", "rice"] },
+  { id: 37, title: "Korean japchae noodles", author: "Jisoo H.", rating: 4.8, reviews: 139, time: 40, diet: "Veg", cuisine: "Korean", difficulty: "Medium", color: "gold", tags: ["noodles", "vegetables", "sesame"] },
+  { id: 38, title: "French mushroom omelette", author: "Camille R.", rating: 4.6, reviews: 73, time: 15, diet: "Keto", cuisine: "French", difficulty: "Easy", color: "sage", tags: ["eggs", "mushroom", "quick"] },
+  { id: 39, title: "Roasted cauliflower couscous", author: "Sofia D.", rating: 4.7, reviews: 82, time: 50, diet: "Vegan", cuisine: "Mediterranean", difficulty: "Hard", color: "gold", tags: ["cauliflower", "couscous", "roasted"] },
+  { id: 40, title: "Spinach pesto flatbread", author: "Luca B.", rating: 4.5, reviews: 64, time: 18, diet: "Veg", cuisine: "Italian", difficulty: "Easy", color: "peach", tags: ["spinach", "pesto", "quick"] },
 ];
 
-const cuisines = ["All", "Italian", "Indian", "Mexican", "Thai"];
+const cuisines = ["All", "Italian", "Indian", "Mexican", "Thai", "Japanese", "Mediterranean", "Chinese", "Korean", "French"];
 const diets = ["All", "Veg", "Vegan", "Keto"];
 const times = [
   { label: "Any", value: 999 },
@@ -25,6 +53,20 @@ const times = [
   { label: "Under 45 min", value: 45 },
 ];
 const difficulties = ["All", "Easy", "Medium", "Hard"];
+
+function recipeEmoji(cuisine) {
+  return {
+    Italian: "🍝",
+    Indian: "🍲",
+    Mexican: "🌮",
+    Thai: "🥢",
+    Japanese: "🍜",
+    Mediterranean: "🫒",
+    Chinese: "🥡",
+    Korean: "🍚",
+    French: "🥘",
+  }[cuisine] || "🍽️";
+}
 
 function FilterGroup({ label, options, value, onChange }) {
   return (
@@ -63,9 +105,7 @@ function RecipeCard({ recipe, onSelect, saved, onSave }) {
       >
         <span className="cover-caption">Recipe · {recipe.title}</span>
         <span className="cover-emoji" aria-hidden="true">
-          {recipe.cuisine === "Italian" ? "🍝" :
-           recipe.cuisine === "Indian" ? "🍲" :
-           recipe.cuisine === "Mexican" ? "🌮" : "🥢"}
+          {recipeEmoji(recipe.cuisine)}
         </span>
       </button>
 
@@ -97,6 +137,93 @@ function RecipeCard({ recipe, onSelect, saved, onSave }) {
   );
 }
 
+function PersonalizedFeed({ recipes, onSelect, saved, onSave }) {
+  const [activeFilter, setActiveFilter] = useState("For you");
+  const feedFilters = ["For you", "Quick meals", "Plant-based", "Italian", "Popular"];
+  const topPick = [...recipes].sort((a, b) => b.rating - a.rating || b.reviews - a.reviews)[0];
+  const recommendations = recipes
+    .filter(recipe => {
+      if (activeFilter === "Quick meals") return recipe.time <= 30;
+      if (activeFilter === "Plant-based") return recipe.diet === "Vegan";
+      if (activeFilter === "Italian") return recipe.cuisine === "Italian";
+      if (activeFilter === "Popular") return recipe.reviews >= 100;
+      return true;
+    })
+    .sort((a, b) => b.rating - a.rating || b.reviews - a.reviews);
+
+  return (
+    <main className="feed-page">
+      <section className="feed-intro">
+        <div>
+          <span className="feed-eyebrow">YOUR DAILY INSPIRATION</span>
+          <h1>A little more of what you love.</h1>
+          <p>A handpicked mix of community favourites, quick ideas, and comforting dishes.</p>
+        </div>
+        <span className="feed-intro-art" aria-hidden="true">🥗</span>
+      </section>
+
+      {topPick && (
+        <section className="feed-feature">
+          <div className={`feed-feature-art cover-${topPick.color}`} aria-hidden="true">
+            <span>{recipeEmoji(topPick.cuisine)}</span>
+            <span className="feed-feature-sparkle">✦</span>
+          </div>
+          <div className="feed-feature-copy">
+            <span className="feed-eyebrow">TODAY'S TOP PICK</span>
+            <h2>{topPick.title}</h2>
+            <p>From {topPick.cuisine} cooking · {topPick.time} min · ★ {topPick.rating}</p>
+            <button className="button button-green" onClick={() => onSelect(topPick)}>
+              See today's pick
+            </button>
+          </div>
+        </section>
+      )}
+
+      <section className="feed-recommendations">
+        <div className="section-heading">
+          <div>
+            <h2>Picked for you</h2>
+            <p>Explore recipes you might love, shared by the community.</p>
+          </div>
+          <span className="results-label">{recommendations.length} recipes</span>
+        </div>
+
+        <div className="feed-filter-row" aria-label="Personalized feed categories">
+          {feedFilters.map(filter => (
+            <button
+              key={filter}
+              className={`filter-chip ${activeFilter === filter ? "selected" : ""}`}
+              onClick={() => setActiveFilter(filter)}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
+
+        {recommendations.length ? (
+          <div className="recipe-grid">
+            {recommendations.slice(0, 8).map(recipe => (
+              <RecipeCard
+                key={recipe.id}
+                recipe={recipe}
+                onSelect={onSelect}
+                saved={saved.includes(recipe.id)}
+                onSave={onSave}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <span>🥣</span>
+            <h3>No recommendations yet</h3>
+            <p>Try another category to discover more recipes.</p>
+          </div>
+        )}
+      </section>
+    </main>
+  );
+}
+
 function RecipeDetails({ recipe, onBack, saved, onSave }) {
   const [servings, setServings] = useState(4);
 
@@ -107,9 +234,7 @@ function RecipeDetails({ recipe, onBack, saved, onSave }) {
       <section className="details-hero">
         <div className={`details-cover cover-${recipe.color}`}>
           <span aria-hidden="true" className="details-emoji">
-            {recipe.cuisine === "Italian" ? "🍝" :
-             recipe.cuisine === "Indian" ? "🍲" :
-             recipe.cuisine === "Mexican" ? "🌮" : "🥢"}
+            {recipeEmoji(recipe.cuisine)}
           </span>
         </div>
 
@@ -117,7 +242,7 @@ function RecipeDetails({ recipe, onBack, saved, onSave }) {
           <div className="tag-row">
             <span className="diet-badge">{recipe.diet}</span>
             <span className="diet-badge">{recipe.cuisine}</span>
-            <span className="diet-badge">Easy</span>
+            <span className="diet-badge">{recipe.difficulty || "Easy"}</span>
           </div>
 
           <h1>{recipe.title}</h1>
@@ -129,7 +254,7 @@ function RecipeDetails({ recipe, onBack, saved, onSave }) {
           <div className="stats-row">
             <div><small>Cook time</small><strong>{recipe.time} min</strong></div>
             <div><small>Servings</small><strong>{servings}</strong></div>
-            <div><small>Difficulty</small><strong>Easy</strong></div>
+            <div><small>Difficulty</small><strong>{recipe.difficulty || "Easy"}</strong></div>
           </div>
 
           <div className="details-actions">
@@ -319,7 +444,7 @@ export default function App() {
       (cuisine === "All" || recipe.cuisine === cuisine) &&
       (diet === "All" || recipe.diet === diet) &&
       recipe.time <= maxTime &&
-      (difficulty === "All" || difficulty === "Easy");
+      (difficulty === "All" || (recipe.difficulty || "Easy") === difficulty);
   }), [search, cuisine, diet, maxTime, difficulty]);
 
   function toggleSaved(id) {
@@ -344,7 +469,7 @@ export default function App() {
         <button className="brand" onClick={goBrowse}>Forkful<span>.</span></button>
         <nav className="main-nav">
           <button className={page === "browse" ? "nav-active" : ""} onClick={goBrowse}>Browse</button>
-          <button onClick={() => window.alert("Personalised feed coming soon!")}>Feed</button>
+          <button className={page === "feed" ? "nav-active" : ""} onClick={() => { setPage("feed"); window.scrollTo(0, 0); }}>Feed</button>
           <button onClick={() => window.alert(`You have ${saved.length} saved recipes.`)}>Collections</button>
           <button onClick={() => window.alert("Shopping lists coming soon!")}>Shopping list</button>
         </nav>
@@ -356,6 +481,8 @@ export default function App() {
 
       {page === "details" && selectedRecipe ? (
         <RecipeDetails recipe={selectedRecipe} onBack={goBrowse} saved={saved.includes(selectedRecipe.id)} onSave={toggleSaved} />
+      ) : page === "feed" ? (
+        <PersonalizedFeed recipes={recipes} onSelect={openRecipe} saved={saved} onSave={toggleSaved} />
       ) : page === "publish" ? (
         <PublishRecipe onBack={goBrowse} />
       ) : (
