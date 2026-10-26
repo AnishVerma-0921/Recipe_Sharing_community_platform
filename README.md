@@ -1,21 +1,80 @@
-<<<<<<< HEAD
-# React + Vite
+# Recipe Sharing Community Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A web application where food lovers can discover, create, and share recipes with others.
 
-Currently, two official plugins are available:
+## About the Project
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The Recipe Sharing Community Platform, named **Forkful**, is designed to bring cooking enthusiasts together. Users can explore different recipes, discover new cuisines, save their favourite dishes, and share their own cooking ideas with the community.
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Browse recipes shared by the community.
+- Search recipes by title, ingredients, and tags.
+- Filter recipes by cuisine, diet, and cooking time.
+- View recipe details, ingredients, and cooking instructions.
+- Save favourite recipes.
+- Publish and share your own recipes.
+- Explore ratings and reviews.
 
-## Expanding the Oxlint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
-=======
-# Recipe_Sharing_community_platform
-A website to sharing different recipies with each other
->>>>>>> fbf8e1dd0bf465171f91910f9c54f28b0020ec6e
+- **Frontend:** React.js, Vite, CSS
+- **Backend:** Node.js, Express.js *(planned)*
+- **Database:** MongoDB *(planned)*
+- **Image Storage:** Cloudinary *(planned)*
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js
+- npm
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/AnishVerma-0921/Recipe_Sharing_community_platform.git
+   ```
+
+2. Navigate to the project folder:
+
+   ```bash
+   cd Recipe_Sharing_community_platform
+   ```
+
+3. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+4. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+5. Open the local URL displayed in your terminal.
+
+## Project Status
+
+Currently under development. The frontend is being built first, followed by backend APIs, database integration, authentication, and recipe-sharing functionality.
+
+## Future Enhancements
+
+- User registration and login
+- Recipe ratings and reviews
+- Personal recipe collections
+- Recipe image uploads
+- Personalised recipe feeds
+- Shopping lists with adjustable serving sizes
+
+## Author
+
+Anish Verma
+
+---
+
+Made with ❤️ for people who love cooking and sharing food.
