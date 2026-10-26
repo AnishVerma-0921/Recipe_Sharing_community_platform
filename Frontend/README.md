@@ -74,6 +74,7 @@ Currently under development. The frontend is being built first, followed by back
 ## Author
 
 Anish Verma
+Amber Gupta
 
 ---
 
