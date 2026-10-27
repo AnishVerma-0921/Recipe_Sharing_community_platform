@@ -1,5 +1,5 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 
 const recipes = [
@@ -53,6 +53,9 @@ const times = [
   { label: "Under 45 min", value: 45 },
 ];
 const difficulties = ["All", "Easy", "Medium", "Hard"];
+const savedRecipesStorageKey = "forkful-saved-recipes";
+const shoppingListStorageKey = "forkful-shopping-list";
+const userRecipesStorageKey = "forkful-user-recipes";
 
 function recipeEmoji(cuisine) {
   return {
@@ -224,8 +227,161 @@ function PersonalizedFeed({ recipes, onSelect, saved, onSave }) {
   );
 }
 
-function RecipeDetails({ recipe, onBack, saved, onSave }) {
-  const [servings, setServings] = useState(4);
+function CollectionsPage({ recipes, onSelect, saved, onSave, onDiscover }) {
+  return (
+    <main className="collections-page">
+      <section className="collections-intro">
+        <div>
+          <span className="feed-eyebrow">YOUR PERSONAL COOKBOOK</span>
+          <h1>Recipes worth keeping.</h1>
+          <p>All your saved favourites, ready whenever you are.</p>
+        </div>
+        <span className="collections-intro-art" aria-hidden="true">♡</span>
+      </section>
+
+      <section className="collections-section">
+        <div className="section-heading">
+          <div>
+            <h2>Saved recipes</h2>
+            <p>Your collection in one place.</p>
+          </div>
+          <span className="results-label">
+            {recipes.length} {recipes.length === 1 ? "recipe" : "recipes"}
+          </span>
+        </div>
+
+        {recipes.length ? (
+          <div className="recipe-grid">
+            {recipes.map(recipe => (
+              <RecipeCard
+                key={recipe.id}
+                recipe={recipe}
+                onSelect={onSelect}
+                saved={saved.includes(recipe.id)}
+                onSave={onSave}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <span>♡</span>
+            <h3>Your collection is waiting</h3>
+            <p>Save recipes while browsing and they’ll show up here.</p>
+            <button className="button button-green" onClick={onDiscover}>Discover recipes</button>
+          </div>
+        )}
+      </section>
+    </main>
+  );
+}
+
+function ShoppingListPage({ items, onToggle, onRemove, onClearCompleted, onAddItem }) {
+  const [newItem, setNewItem] = useState("");
+  const completedCount = items.filter(item => item.checked).length;
+
+  function submitItem(event) {
+    event.preventDefault();
+    const name = newItem.trim();
+    if (!name) return;
+
+    onAddItem(name);
+    setNewItem("");
+  }
+
+  return (
+    <main className="shopping-page">
+      <section className="collections-intro">
+        <div>
+          <span className="feed-eyebrow">YOUR KITCHEN, PLANNED</span>
+          <h1>Shopping list.</h1>
+          <p>Keep track of what you need and check things off as you shop.</p>
+        </div>
+        <span className="collections-intro-art" aria-hidden="true">✓</span>
+      </section>
+
+      <section className="shopping-section">
+        <div className="section-heading">
+          <div>
+            <h2>Things to pick up</h2>
+            <p>{items.length - completedCount} left · {completedCount} completed</p>
+          </div>
+          {completedCount > 0 && (
+            <button className="button button-outline" onClick={onClearCompleted}>Clear completed</button>
+          )}
+        </div>
+
+        <form className="shopping-add-form" onSubmit={submitItem}>
+          <label className="visually-hidden" htmlFor="shopping-item">Add an item</label>
+          <input
+            id="shopping-item"
+            value={newItem}
+            onChange={event => setNewItem(event.target.value)}
+            placeholder="Add an item to your list"
+            maxLength={100}
+          />
+          <button className="button button-green" type="submit">Add item</button>
+        </form>
+
+        {items.length ? (
+          <ul className="shopping-items">
+            {items.map(item => (
+              <li className={`shopping-item ${item.checked ? "is-checked" : ""}`} key={item.id}>
+                <label className="shopping-item-label">
+                  <input
+                    type="checkbox"
+                    checked={item.checked}
+                    onChange={() => onToggle(item.id)}
+                  />
+                  <span className="shopping-item-name">{item.name}</span>
+                  {item.amount && <span className="shopping-item-amount">{item.amount}</span>}
+                </label>
+                <div className="shopping-item-source">
+                  {item.recipeTitle && <span>For {item.recipeTitle}</span>}
+                  <button
+                    className="shopping-remove"
+                    onClick={() => onRemove(item.id)}
+                    aria-label={`Remove ${item.name}`}
+                    title="Remove item"
+                  >
+                    ×
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="empty-state">
+            <span>🧺</span>
+            <h3>Your list is empty</h3>
+            <p>Add an item above or add ingredients from a recipe.</p>
+          </div>
+        )}
+      </section>
+    </main>
+  );
+}
+
+function RecipeDetails({ recipe, onBack, saved, onSave, onAddToShoppingList }) {
+  const [servings, setServings] = useState(recipe.servings || 4);
+  const ingredients = recipe.ingredients?.length
+    ? recipe.ingredients.map(item => [
+      item.name,
+      [item.quantity, item.unit].filter(Boolean).join(" "),
+    ])
+    : [
+      ["Red lentils", `${servings / 4} cup`],
+      ["Coconut milk", `${servings * 100} ml`],
+      ["Spinach", `${servings / 2} handfuls`],
+      ["Garlic cloves", `${servings}`],
+      ["Turmeric", `${servings / 4} tsp`],
+    ];
+  const methodSteps = recipe.steps?.length
+    ? recipe.steps
+    : [
+      "Rinse the lentils and simmer with turmeric and water until soft.",
+      "Fry garlic until golden, then stir in the coconut milk.",
+      "Fold in the spinach, season, and serve hot.",
+    ];
 
   return (
     <main className="details-page">
@@ -265,7 +421,7 @@ function RecipeDetails({ recipe, onBack, saved, onSave }) {
             <button className="button button-outline" onClick={() => navigator.clipboard?.writeText(window.location.href)}>Share</button>
           </div>
 
-          <button className="button button-orange full-button" onClick={() => window.alert("Shopping lists will be added in a later step.")}>
+          <button className="button button-orange full-button" onClick={() => onAddToShoppingList(recipe, ingredients)}>
             Add to shopping list
           </button>
         </div>
@@ -280,13 +436,7 @@ function RecipeDetails({ recipe, onBack, saved, onSave }) {
             <strong>{servings}</strong>
             <button onClick={() => setServings(s => Math.min(20, s + 1))}>+</button>
           </div>
-          {[
-            ["Red lentils", `${servings / 4} cup`],
-            ["Coconut milk", `${servings * 100} ml`],
-            ["Spinach", `${servings / 2} handfuls`],
-            ["Garlic cloves", `${servings}`],
-            ["Turmeric", `${servings / 4} tsp`],
-          ].map(([name, amount]) => (
+          {ingredients.map(([name, amount]) => (
             <div className="ingredient-row" key={name}>
               <span>{name}</span><span>{amount}</span>
             </div>
@@ -295,16 +445,12 @@ function RecipeDetails({ recipe, onBack, saved, onSave }) {
 
         <section className="method-panel">
           <h2>Method</h2>
-          {[
-            "Rinse the lentils and simmer with turmeric and water until soft.",
-            "Fry garlic until golden, then stir in the coconut milk.",
-            "Fold in the spinach, season, and serve hot.",
-          ].map((step, index) => (
-            <div className="method-step" key={step}>
+          {methodSteps.map((step, index) => (
+            <div className="method-step" key={`method-${index}`}>
               <span className="step-number">{index + 1}</span>
               <p>{step}</p>
-              <div className={`step-photo cover-${["sage", "peach", "gold"][index]}`}>
-                Step photo {index + 1}
+              <div className={`step-photo cover-${["sage", "peach", "gold"][index % 3]}`}>
+                Step {index + 1}
               </div>
             </div>
           ))}
@@ -328,15 +474,18 @@ function RecipeDetails({ recipe, onBack, saved, onSave }) {
   );
 }
 
-function PublishRecipe({ onBack }) {
+function PublishRecipe({ onBack, onPublish }) {
   const [title, setTitle] = useState("");
   const [cuisine, setCuisine] = useState("Indian");
   const [diet, setDiet] = useState("Vegan");
   const [time, setTime] = useState(40);
   const [servings, setServings] = useState(4);
+  const [difficulty, setDifficulty] = useState("Easy");
+  const [tags, setTags] = useState("");
   const [ingredients, setIngredients] = useState([{ name: "", qty: "1", unit: "cup" }]);
   const [steps, setSteps] = useState([""]);
   const [cover, setCover] = useState("");
+  const [error, setError] = useState("");
 
   function updateIngredient(index, key, value) {
     setIngredients(old => old.map((item, i) =>
@@ -351,7 +500,53 @@ function PublishRecipe({ onBack }) {
 
       <form className="publish-form" onSubmit={e => {
         e.preventDefault();
-        window.alert("Your form is ready! Saving recipes to the database comes next.");
+        setError("");
+        const validIngredients = ingredients
+          .map(item => ({
+            name: item.name.trim(),
+            quantity: item.qty.trim(),
+            unit: item.unit.trim(),
+          }))
+          .filter(item => item.name);
+        const validSteps = steps.map(step => step.trim()).filter(Boolean);
+
+        if (!title.trim()) {
+          setError("Enter a recipe title before publishing.");
+          return;
+        }
+        if (!validIngredients.length) {
+          setError("Add at least one ingredient before publishing.");
+          return;
+        }
+        if (!validSteps.length) {
+          setError("Add at least one method step before publishing.");
+          return;
+        }
+
+        const recipe = {
+          id: `user-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          title: title.trim(),
+          author: "You",
+          rating: 0,
+          reviews: 0,
+          time: Number(time),
+          diet,
+          cuisine,
+          difficulty,
+          color: ["peach", "sage", "gold"][Math.floor(Math.random() * 3)],
+          tags: tags.split(",").map(tag => tag.trim()).filter(Boolean),
+          servings: Number(servings),
+          ingredients: validIngredients,
+          steps: validSteps,
+          cover,
+        };
+
+        try {
+          onPublish(recipe);
+        } catch (publishError) {
+          console.error("Unable to publish recipe.", publishError);
+          setError("The recipe could not be saved in this browser. Check available storage and try again.");
+        }
       }}>
         <section className="form-panel">
           <h2>Basics</h2>
@@ -376,16 +571,18 @@ function PublishRecipe({ onBack }) {
               </select>
             </label>
             <label className="field-label">Difficulty
-              <select><option>Easy</option><option>Medium</option><option>Hard</option></select>
+              <select value={difficulty} onChange={e => setDifficulty(e.target.value)}>
+                {difficulties.slice(1).map(value => <option key={value}>{value}</option>)}
+              </select>
             </label>
             <label className="field-label">Cook time (min)
-              <input type="number" min="1" value={time} onChange={e => setTime(e.target.value)} />
+              <input required type="number" min="1" value={time} onChange={e => setTime(e.target.value)} />
             </label>
             <label className="field-label">Servings
-              <input type="number" min="1" value={servings} onChange={e => setServings(e.target.value)} />
+              <input required type="number" min="1" value={servings} onChange={e => setServings(e.target.value)} />
             </label>
             <label className="field-label">Tags
-              <input placeholder="dinner, comfort" />
+              <input value={tags} onChange={e => setTags(e.target.value)} placeholder="dinner, comfort" />
             </label>
           </div>
         </section>
@@ -416,8 +613,9 @@ function PublishRecipe({ onBack }) {
 
         <div className="form-actions">
           <button className="button button-orange" type="submit">Publish recipe</button>
-          <button className="button button-outline" type="button" onClick={() => window.alert("Draft saving will be connected to the backend later.")}>Save draft</button>
+          <button className="button button-outline" type="button" onClick={onBack}>Cancel</button>
         </div>
+        {error && <p className="publish-error" role="alert">{error}</p>}
       </form>
     </main>
   );
@@ -430,11 +628,112 @@ export default function App() {
   const [maxTime, setMaxTime] = useState(999);
   const [difficulty, setDifficulty] = useState("All");
   const [visibleCount, setVisibleCount] = useState(8);
-  const [saved, setSaved] = useState([]);
+  const [userRecipes, setUserRecipes] = useState(() => {
+    try {
+      const stored = window.localStorage.getItem(userRecipesStorageKey);
+      if (!stored) return [];
+
+      const storedRecipes = JSON.parse(stored);
+      if (!Array.isArray(storedRecipes)) {
+        throw new TypeError("Published recipes must be stored as an array.");
+      }
+
+      return storedRecipes.filter(recipe =>
+        recipe &&
+        typeof recipe.id === "string" &&
+        typeof recipe.title === "string" &&
+        typeof recipe.author === "string" &&
+        Number.isFinite(recipe.time) &&
+        typeof recipe.cuisine === "string" &&
+        typeof recipe.diet === "string" &&
+        Array.isArray(recipe.tags) &&
+        recipe.tags.every(tag => typeof tag === "string") &&
+        Array.isArray(recipe.ingredients) &&
+        recipe.ingredients.every(item =>
+          item &&
+          typeof item.name === "string" &&
+          typeof item.quantity === "string" &&
+          typeof item.unit === "string"
+        ) &&
+        Array.isArray(recipe.steps) &&
+        recipe.steps.every(step => typeof step === "string")
+      );
+    } catch (error) {
+      console.error("Unable to load published recipes from browser storage.", error);
+      return [];
+    }
+  });
+  const allRecipes = useMemo(() => [...recipes, ...userRecipes], [userRecipes]);
+  const [saved, setSaved] = useState(() => {
+    try {
+      const stored = window.localStorage.getItem(savedRecipesStorageKey);
+      if (!stored) return [];
+
+      const storedIds = JSON.parse(stored);
+      if (!Array.isArray(storedIds)) {
+        throw new TypeError("Saved recipes must be stored as an array.");
+      }
+
+      const recipeIds = new Set([...recipes, ...userRecipes].map(recipe => recipe.id));
+      return [...new Set(storedIds.filter(id =>
+        (Number.isInteger(id) || typeof id === "string") && recipeIds.has(id)
+      ))];
+    } catch (error) {
+      console.error("Unable to load saved recipes from browser storage.", error);
+      return [];
+    }
+  });
+  const [shoppingItems, setShoppingItems] = useState(() => {
+    try {
+      const stored = window.localStorage.getItem(shoppingListStorageKey);
+      if (!stored) return [];
+
+      const items = JSON.parse(stored);
+      if (!Array.isArray(items)) {
+        throw new TypeError("Shopping list must be stored as an array.");
+      }
+
+      return items.filter(item =>
+        item &&
+        typeof item.id === "string" &&
+        typeof item.name === "string" &&
+        typeof item.checked === "boolean" &&
+        (item.amount === undefined || typeof item.amount === "string") &&
+        (item.recipeTitle === undefined || typeof item.recipeTitle === "string")
+      );
+    } catch (error) {
+      console.error("Unable to load shopping list from browser storage.", error);
+      return [];
+    }
+  });
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [page, setPage] = useState("browse");
 
-  const filteredRecipes = useMemo(() => recipes.filter(recipe => {
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(userRecipesStorageKey, JSON.stringify(userRecipes));
+    } catch (error) {
+      console.error("Unable to save published recipes to browser storage.", error);
+    }
+  }, [userRecipes]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(savedRecipesStorageKey, JSON.stringify(saved));
+    } catch (error) {
+      console.error("Unable to save recipes to browser storage.", error);
+    }
+  }, [saved]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(shoppingListStorageKey, JSON.stringify(shoppingItems));
+    } catch (error) {
+      console.error("Unable to save shopping list to browser storage.", error);
+    }
+  }, [shoppingItems]);
+
+  const filteredRecipes = useMemo(() => allRecipes.filter(recipe => {
     const query = search.trim().toLowerCase();
     const matchesSearch = !query ||
       [recipe.title, recipe.author, recipe.cuisine, recipe.diet, ...recipe.tags]
@@ -445,10 +744,44 @@ export default function App() {
       (diet === "All" || recipe.diet === diet) &&
       recipe.time <= maxTime &&
       (difficulty === "All" || (recipe.difficulty || "Easy") === difficulty);
-  }), [search, cuisine, diet, maxTime, difficulty]);
+  }), [allRecipes, search, cuisine, diet, maxTime, difficulty]);
 
   function toggleSaved(id) {
     setSaved(old => old.includes(id) ? old.filter(x => x !== id) : [...old, id]);
+  }
+
+  function addRecipeIngredients(recipe, ingredients) {
+    setShoppingItems(old => {
+      const existingIds = new Set(old.map(item => item.id));
+      const additions = ingredients
+        .map(([name, amount]) => ({
+          id: `recipe-${recipe.id}-${name}`,
+          name,
+          amount,
+          recipeTitle: recipe.title,
+          checked: false,
+        }))
+        .filter(item => !existingIds.has(item.id));
+      return [...old, ...additions];
+    });
+    setPage("shopping");
+    window.scrollTo(0, 0);
+  }
+
+  function addShoppingItem(name) {
+    setShoppingItems(old => [
+      ...old,
+      { id: `custom-${Date.now()}-${Math.random().toString(36).slice(2)}`, name, checked: false },
+    ]);
+  }
+
+  function publishRecipe(recipe) {
+    const updatedRecipes = [...userRecipes, recipe];
+    window.localStorage.setItem(userRecipesStorageKey, JSON.stringify(updatedRecipes));
+    setUserRecipes(updatedRecipes);
+    setSelectedRecipe(recipe);
+    setPage("details");
+    window.scrollTo(0, 0);
   }
 
   function openRecipe(recipe) {
@@ -470,8 +803,8 @@ export default function App() {
         <nav className="main-nav">
           <button className={page === "browse" ? "nav-active" : ""} onClick={goBrowse}>Browse</button>
           <button className={page === "feed" ? "nav-active" : ""} onClick={() => { setPage("feed"); window.scrollTo(0, 0); }}>Feed</button>
-          <button onClick={() => window.alert(`You have ${saved.length} saved recipes.`)}>Collections</button>
-          <button onClick={() => window.alert("Shopping lists coming soon!")}>Shopping list</button>
+          <button className={page === "collections" ? "nav-active" : ""} onClick={() => { setPage("collections"); window.scrollTo(0, 0); }}>Collections</button>
+          <button className={page === "shopping" ? "nav-active" : ""} onClick={() => { setPage("shopping"); window.scrollTo(0, 0); }}>Shopping list</button>
         </nav>
         <div className="header-actions">
           <button className="button button-orange publish-button" onClick={() => { setPage("publish"); window.scrollTo(0, 0); }}>Publish recipe</button>
@@ -480,11 +813,35 @@ export default function App() {
       </header>
 
       {page === "details" && selectedRecipe ? (
-        <RecipeDetails recipe={selectedRecipe} onBack={goBrowse} saved={saved.includes(selectedRecipe.id)} onSave={toggleSaved} />
+        <RecipeDetails
+          recipe={selectedRecipe}
+          onBack={goBrowse}
+          saved={saved.includes(selectedRecipe.id)}
+          onSave={toggleSaved}
+          onAddToShoppingList={addRecipeIngredients}
+        />
       ) : page === "feed" ? (
-        <PersonalizedFeed recipes={recipes} onSelect={openRecipe} saved={saved} onSave={toggleSaved} />
+        <PersonalizedFeed recipes={allRecipes} onSelect={openRecipe} saved={saved} onSave={toggleSaved} />
+      ) : page === "collections" ? (
+        <CollectionsPage
+          recipes={allRecipes.filter(recipe => saved.includes(recipe.id))}
+          onSelect={openRecipe}
+          saved={saved}
+          onSave={toggleSaved}
+          onDiscover={goBrowse}
+        />
+      ) : page === "shopping" ? (
+        <ShoppingListPage
+          items={shoppingItems}
+          onToggle={id => setShoppingItems(old => old.map(item =>
+            item.id === id ? { ...item, checked: !item.checked } : item
+          ))}
+          onRemove={id => setShoppingItems(old => old.filter(item => item.id !== id))}
+          onClearCompleted={() => setShoppingItems(old => old.filter(item => !item.checked))}
+          onAddItem={addShoppingItem}
+        />
       ) : page === "publish" ? (
-        <PublishRecipe onBack={goBrowse} />
+        <PublishRecipe onBack={goBrowse} onPublish={publishRecipe} />
       ) : (
         <main className="browse-page">
           <section className="welcome">
