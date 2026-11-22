@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import "./design.css";
+import AuthModal from "./AuthPage";
+import AdminPanel from "./AdminPanel.jsx";
 
 const recipes = [
   { id: 1, title: "Smoky chickpea stew", author: "Meera P.", rating: 4.8, reviews: 212, time: 35, diet: "Vegan", cuisine: "Indian", color: "peach", tags: ["comfort", "stew"] },
@@ -56,6 +58,7 @@ const difficulties = ["All", "Easy", "Medium", "Hard"];
 const savedRecipesStorageKey = "forkful-saved-recipes";
 const shoppingListStorageKey = "forkful-shopping-list";
 const userRecipesStorageKey = "forkful-user-recipes";
+const currentUserStorageKey = "forkful-current-user";
 
 function recipeEmoji(cuisine) {
   return {
@@ -69,6 +72,16 @@ function recipeEmoji(cuisine) {
     Korean: "🍚",
     French: "🥘",
   }[cuisine] || "🍽️";
+}
+
+function getInitials(name) {
+  if (!name) return "";
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map(part => part[0].toUpperCase())
+    .join("");
 }
 
 function FilterGroup({ label, options, value, onChange }) {
@@ -275,6 +288,232 @@ function CollectionsPage({ recipes, onSelect, saved, onSave, onDiscover }) {
   );
 }
 
+function ProfilePage({
+  user,
+  allRecipes,
+  publishedRecipes,
+  savedRecipes,
+  saved,
+  onSave,
+  onSelectRecipe,
+  onPublishClick,
+  onLogout,
+  onOpenAuth,
+  onUpdateUser,
+}) {
+  const [activeTab, setActiveTab] = useState("all"); // "all" | "mine" | "saved"
+  const [editingBio, setEditingBio] = useState(false);
+  const [bioDraft, setBioDraft] = useState(
+    user?.bio || "Home cook sharing everyday comfort food & quick weeknight bowls."
+  );
+
+  if (!user) {
+    return (
+      <main className="collections-page">
+        <div className="empty-state">
+          <span>👩‍🍳</span>
+          <h3>You're not signed in</h3>
+          <p>Log in or create an account to view your chef profile.</p>
+          <button className="button button-green" onClick={onOpenAuth}>
+            Log in / Sign up
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  const handle = user.name.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+
+  const cuisineHighlights = [
+    { label: "Italian", emoji: "🍝" },
+    { label: "Indian", emoji: "🍲" },
+    { label: "Thai", emoji: "🥢" },
+    { label: "Mexican", emoji: "🌮" },
+    { label: "Japanese", emoji: "🍜" },
+    { label: "Korean", emoji: "🍚" },
+  ];
+
+  const displayedRecipes =
+    activeTab === "mine"
+      ? publishedRecipes
+      : activeTab === "saved"
+        ? savedRecipes
+        : allRecipes;
+
+  function saveBio(e) {
+    e.preventDefault();
+    onUpdateUser({ ...user, bio: bioDraft.trim() });
+    setEditingBio(false);
+  }
+
+  return (
+    <main className="insta-layout-page">
+      {/* Instagram Top Layout: Left Avatar + Right Handle, Stats & Bio */}
+      <section className="insta-layout-header">
+        <div className="insta-layout-avatar">
+          {getInitials(user.name)}
+        </div>
+
+        <div className="insta-layout-meta">
+          <div className="insta-layout-title-row">
+            <h1 className="insta-layout-username">{handle}</h1>
+            <div className="header-actions">
+              <button
+                type="button"
+                className="button button-green"
+                onClick={onPublishClick}
+              >
+                Publish recipe
+              </button>
+              <button
+                type="button"
+                className="button button-outline"
+                onClick={() => setEditingBio(prev => !prev)}
+              >
+                {editingBio ? "Cancel" : "Edit bio"}
+              </button>
+              <button
+                type="button"
+                className="button button-outline"
+                onClick={onLogout}
+              >
+                Log out
+              </button>
+            </div>
+          </div>
+
+          <div className="insta-layout-stats">
+            <span><strong>{allRecipes.length}</strong> recipes</span>
+            <span><strong>{publishedRecipes.length}</strong> published</span>
+            <span><strong>{savedRecipes.length}</strong> saved</span>
+          </div>
+
+          <div className="insta-layout-bio">
+            <strong>{user.name}</strong>
+            {editingBio ? (
+              <form className="insta-layout-bio-form" onSubmit={saveBio}>
+                <input
+                  value={bioDraft}
+                  onChange={e => setBioDraft(e.target.value)}
+                  maxLength={140}
+                  placeholder="Write a short bio..."
+                  autoFocus
+                />
+                <button type="submit" className="button button-green">
+                  Save
+                </button>
+              </form>
+            ) : (
+              <p>{user.bio || "Home cook sharing everyday comfort food & quick weeknight bowls."}</p>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Story-style Circular Highlights */}
+      <section className="insta-layout-highlights" aria-label="Cuisine highlights">
+        {cuisineHighlights.map(item => (
+          <button
+            key={item.label}
+            type="button"
+            className="insta-layout-highlight"
+            onClick={() => setActiveTab("all")}
+          >
+            <span className="insta-layout-highlight-circle">{item.emoji}</span>
+            <span className="insta-layout-highlight-name">{item.label}</span>
+          </button>
+        ))}
+      </section>
+
+      {/* Instagram 3-Tab Switcher */}
+      <div className="insta-layout-tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "all"}
+          className={`insta-layout-tab ${activeTab === "all" ? "active" : ""}`}
+          onClick={() => setActiveTab("all")}
+        >
+          ALL RECIPES ({allRecipes.length})
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "mine"}
+          className={`insta-layout-tab ${activeTab === "mine" ? "active" : ""}`}
+          onClick={() => setActiveTab("mine")}
+        >
+          PUBLISHED ({publishedRecipes.length})
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "saved"}
+          className={`insta-layout-tab ${activeTab === "saved" ? "active" : ""}`}
+          onClick={() => setActiveTab("saved")}
+        >
+          SAVED ({savedRecipes.length})
+        </button>
+      </div>
+
+      {/* 3-Column Square Grid Using Forkful's Existing Cover Classes */}
+      {displayedRecipes.length ? (
+        <section className="insta-layout-grid" aria-label="Recipe grid">
+          {displayedRecipes.map(recipe => {
+            const isSaved = saved.includes(recipe.id);
+            return (
+              <article key={recipe.id} className="insta-layout-cell">
+                <button
+                  type="button"
+                  className={`insta-layout-cell-btn cover-${recipe.color}`}
+                  onClick={() => onSelectRecipe(recipe)}
+                  aria-label={`View ${recipe.title}`}
+                >
+                  <span className="cover-emoji" aria-hidden="true">
+                    {recipeEmoji(recipe.cuisine)}
+                  </span>
+                  <span className="insta-layout-cell-title">{recipe.title}</span>
+
+                  <div className="insta-layout-cell-hover">
+                    <span>★ {recipe.rating || "New"}</span>
+                    <span>{recipe.time} min</span>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  className={`save-icon insta-layout-cell-save ${isSaved ? "is-saved" : ""}`}
+                  onClick={() => onSave(recipe.id)}
+                  aria-label={isSaved ? "Remove from saved recipes" : "Save recipe"}
+                >
+                  {isSaved ? "♥" : "♡"}
+                </button>
+              </article>
+            );
+          })}
+        </section>
+      ) : (
+        <div className="empty-state">
+          <span>{activeTab === "mine" ? "🍳" : "♡"}</span>
+          <h3>{activeTab === "mine" ? "No published recipes yet" : "No saved recipes yet"}</h3>
+          <p>
+            {activeTab === "mine"
+              ? "Publish a recipe to see it in your grid."
+              : "Save recipes while browsing and they’ll appear here."}
+          </p>
+          <button
+            type="button"
+            className="button button-green"
+            onClick={activeTab === "mine" ? onPublishClick : () => setActiveTab("all")}
+          >
+            {activeTab === "mine" ? "Publish recipe" : "Show all recipes"}
+          </button>
+        </div>
+      )}
+    </main>
+  );
+}
+
 function ShoppingListPage({ items, onToggle, onRemove, onClearCompleted, onAddItem }) {
   const [newItem, setNewItem] = useState("");
   const completedCount = items.filter(item => item.checked).length;
@@ -364,10 +603,11 @@ function ShoppingListPage({ items, onToggle, onRemove, onClearCompleted, onAddIt
 function RecipeDetails({ recipe, onBack, saved, onSave, onAddToShoppingList }) {
   const [servings, setServings] = useState(recipe.servings || 4);
   const ingredients = recipe.ingredients?.length
-    ? recipe.ingredients.map(item => [
-      item.name,
-      [item.quantity, item.unit].filter(Boolean).join(" "),
-    ])
+    ? recipe.ingredients.map(item =>
+      typeof item === "string"
+        ? [item, ""]
+        : [item.name, [item.quantity, item.unit].filter(Boolean).join(" ")]
+    )
     : [
       ["Red lentils", `${servings / 4} cup`],
       ["Coconut milk", `${servings * 100} ml`],
@@ -474,7 +714,7 @@ function RecipeDetails({ recipe, onBack, saved, onSave, onAddToShoppingList }) {
   );
 }
 
-function PublishRecipe({ onBack, onPublish }) {
+function PublishRecipe({ onBack, onPublish, currentUser }) {
   const [title, setTitle] = useState("");
   const [cuisine, setCuisine] = useState("Indian");
   const [diet, setDiet] = useState("Vegan");
@@ -526,7 +766,7 @@ function PublishRecipe({ onBack, onPublish }) {
         const recipe = {
           id: `user-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
           title: title.trim(),
-          author: "You",
+          author: currentUser?.name || "You",
           rating: 0,
           reviews: 0,
           time: Number(time),
@@ -628,6 +868,15 @@ export default function App() {
   const [maxTime, setMaxTime] = useState(999);
   const [difficulty, setDifficulty] = useState("All");
   const [visibleCount, setVisibleCount] = useState(8);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const stored = window.localStorage.getItem(currentUserStorageKey);
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
   const [userRecipes, setUserRecipes] = useState(() => {
     try {
       const stored = window.localStorage.getItem(userRecipesStorageKey);
@@ -711,6 +960,18 @@ export default function App() {
 
   useEffect(() => {
     try {
+      if (currentUser) {
+        window.localStorage.setItem(currentUserStorageKey, JSON.stringify(currentUser));
+      } else {
+        window.localStorage.removeItem(currentUserStorageKey);
+      }
+    } catch (error) {
+      console.error("Unable to save user session to browser storage.", error);
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    try {
       window.localStorage.setItem(userRecipesStorageKey, JSON.stringify(userRecipes));
     } catch (error) {
       console.error("Unable to save published recipes to browser storage.", error);
@@ -736,7 +997,7 @@ export default function App() {
   const filteredRecipes = useMemo(() => allRecipes.filter(recipe => {
     const query = search.trim().toLowerCase();
     const matchesSearch = !query ||
-      [recipe.title, recipe.author, recipe.cuisine, recipe.diet, ...recipe.tags]
+      [recipe.title, recipe.author, recipe.cuisine, recipe.diet, ...(recipe.tags ?? [])]
         .some(text => text.toLowerCase().includes(query));
 
     return matchesSearch &&
@@ -796,6 +1057,12 @@ export default function App() {
     window.scrollTo(0, 0);
   }
 
+  function goProfile() {
+    setPage("profile");
+    setSelectedRecipe(null);
+    window.scrollTo(0, 0);
+  }
+
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -805,14 +1072,79 @@ export default function App() {
           <button className={page === "feed" ? "nav-active" : ""} onClick={() => { setPage("feed"); window.scrollTo(0, 0); }}>Feed</button>
           <button className={page === "collections" ? "nav-active" : ""} onClick={() => { setPage("collections"); window.scrollTo(0, 0); }}>Collections</button>
           <button className={page === "shopping" ? "nav-active" : ""} onClick={() => { setPage("shopping"); window.scrollTo(0, 0); }}>Shopping list</button>
+          {currentUser?.role === "admin" && (
+            <button className={`admin-nav-btn ${page === "admin" ? "nav-active" : ""}`} onClick={() => { setPage("admin"); window.scrollTo(0, 0); }}>
+              Admin Panel
+            </button>
+          )}
         </nav>
         <div className="header-actions">
+          {currentUser && (
+            <span className={`cloth-tag cloth-tag-${currentUser.role || "user"}`}>
+              <span className="cloth-tag-stitch"></span>
+              {currentUser.role === "admin" ? "ADMIN" : "USER"}
+            </span>
+          )}
           <button className="button button-green publish-button" onClick={() => { setPage("publish"); window.scrollTo(0, 0); }}>Publish recipe</button>
-          <button className="avatar" aria-label="User profile" onClick={() => window.alert("Profile coming soon!")}>AK</button>
+          {currentUser ? (
+            <button
+              className="avatar"
+              aria-label="Open profile"
+              title={`${currentUser.name} · View Profile`}
+              onClick={goProfile}
+            >
+              {getInitials(currentUser.name)}
+            </button>
+          ) : (
+            <button
+              className="button button-outline"
+              onClick={() => setAuthModalOpen(true)}
+            >
+              Log in
+            </button>
+          )}
         </div>
       </header>
 
-      {page === "details" && selectedRecipe ? (
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        onAuthSuccess={user => {
+          setCurrentUser(user);
+          setAuthModalOpen(false);
+          if (user.role === "admin") {
+            setPage("admin");
+          } else {
+            goProfile();
+          }
+        }}
+      />
+
+      {page === "admin" && currentUser?.role === "admin" ? (
+        <AdminPanel
+          onLogout={() => {
+            setCurrentUser(null);
+            goBrowse();
+          }}
+        />
+      ) : page === "profile" ? (
+        <ProfilePage
+          user={currentUser}
+          allRecipes={allRecipes}
+          publishedRecipes={userRecipes}
+          savedRecipes={allRecipes.filter(recipe => saved.includes(recipe.id))}
+          saved={saved}
+          onSave={toggleSaved}
+          onSelectRecipe={openRecipe}
+          onPublishClick={() => { setPage("publish"); window.scrollTo(0, 0); }}
+          onLogout={() => {
+            setCurrentUser(null);
+            goBrowse();
+          }}
+          onOpenAuth={() => setAuthModalOpen(true)}
+          onUpdateUser={updated => setCurrentUser(updated)}
+        />
+      ) : page === "details" && selectedRecipe ? (
         <RecipeDetails
           recipe={selectedRecipe}
           onBack={goBrowse}
@@ -841,7 +1173,7 @@ export default function App() {
           onAddItem={addShoppingItem}
         />
       ) : page === "publish" ? (
-        <PublishRecipe onBack={goBrowse} onPublish={publishRecipe} />
+        <PublishRecipe onBack={goBrowse} onPublish={publishRecipe} currentUser={currentUser} />
       ) : (
         <main className="browse-page">
           <section className="welcome">

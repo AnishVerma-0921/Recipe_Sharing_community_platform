@@ -245,3 +245,224 @@ body, :root {
   .welcome h1 { font-size: 34px; }
   .recipe-cover { height: 130px; }
 }
+
+/* =========================================================
+   REALISTIC CLOTH TAGS & ADMIN PANEL STYLES
+   ========================================================= */
+
+/* Cloth-like Tag with stitching effect */
+.cloth-tag {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  font-family: 'Courier New', Courier, monospace, sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 5px 14px 5px 12px;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.18), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+  border: 1px dashed rgba(255, 255, 255, 0.6);
+  user-select: none;
+  vertical-align: middle;
+}
+
+/* Faux stitch border inside */
+.cloth-tag-stitch {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
+  margin-right: 8px;
+}
+
+/* ADMIN TAG: Bold Carmine Red / Crimson woven fabric */
+.cloth-tag-admin {
+  background: linear-gradient(135deg, #c0392b 0%, #e74c3c 50%, #962d22 100%);
+  color: #fff8f0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 220, 220, 0.7);
+  box-shadow: 0 3px 8px rgba(192, 57, 43, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+/* USER TAG: Denim Navy / Slate Indigo woven fabric */
+.cloth-tag-user {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #1a252f 100%);
+  color: #ecf0f1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  border-color: rgba(189, 195, 199, 0.5);
+  box-shadow: 0 3px 8px rgba(44, 62, 80, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+/* Navigation button for Admin */
+.admin-nav-btn {
+  color: #c0392b !important;
+  font-weight: 750 !important;
+}
+.admin-nav-btn:hover, .main-nav .admin-nav-btn.nav-active {
+  color: #962d22 !important;
+  border-bottom-color: #c0392b !important;
+}
+
+/* Admin Dashboard Page Layout */
+.admin-page-container {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.admin-panel-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(45, 90, 67, 0.08);
+  padding: 32px;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--color-border);
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.admin-title-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.admin-title-row h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 850;
+  color: #1A1D1A;
+}
+
+.admin-subtitle {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 15px;
+}
+
+.admin-stats-bar {
+  display: flex;
+  gap: 20px;
+  margin: 28px 0;
+  flex-wrap: wrap;
+}
+
+.admin-stat-box {
+  background: #FAF8F5;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px 24px;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-stat-num {
+  font-size: 28px;
+  font-weight: 850;
+  color: var(--color-primary);
+}
+
+.admin-stat-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+.admin-table-wrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+}
+
+.admin-users-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-users-table th {
+  background: #FAF8F5;
+  padding: 14px 18px;
+  font-size: 13px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.admin-users-table td {
+  padding: 16px 18px;
+  font-size: 15px;
+  border-bottom: 1px solid var(--color-border);
+  color: #1A1D1A;
+  vertical-align: middle;
+}
+
+.admin-users-table tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-users-table tbody tr:hover {
+  background: #fdfbf7;
+}
+
+.admin-user-row {
+  background: #fffcf8;
+}
+
+.user-id-cell code {
+  background: #ede8dc;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #4a554e;
+}
+
+.user-name-cell strong {
+  font-weight: 700;
+  color: #1A1D1A;
+}
+
+.protected-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #8C968F;
+  background: #F1ECE1;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.button-red-delete {
+  background: #fff;
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.button-red-delete:hover {
+  background: #e74c3c;
+  color: #ffffff;
+}
