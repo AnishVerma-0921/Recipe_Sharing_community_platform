@@ -1,6 +1,6 @@
-
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
+import "./design.css";
 
 const recipes = [
   { id: 1, title: "Smoky chickpea stew", author: "Meera P.", rating: 4.8, reviews: 212, time: 35, diet: "Vegan", cuisine: "Indian", color: "peach", tags: ["comfort", "stew"] },
@@ -807,7 +807,7 @@ export default function App() {
           <button className={page === "shopping" ? "nav-active" : ""} onClick={() => { setPage("shopping"); window.scrollTo(0, 0); }}>Shopping list</button>
         </nav>
         <div className="header-actions">
-          <button className="button button-orange publish-button" onClick={() => { setPage("publish"); window.scrollTo(0, 0); }}>Publish recipe</button>
+          <button className="button button-green publish-button" onClick={() => { setPage("publish"); window.scrollTo(0, 0); }}>Publish recipe</button>
           <button className="avatar" aria-label="User profile" onClick={() => window.alert("Profile coming soon!")}>AK</button>
         </div>
       </header>
