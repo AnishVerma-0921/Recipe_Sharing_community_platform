@@ -223,36 +223,94 @@ textarea:focus-visible {
 .filters {
   margin: 24px 0 36px;
   display: flex;
-  flex-direction: column;
-  gap: 14px;
+  align-items: center;
+  gap: 12px;
 }
 
-.filter-group {
-  display: flex;
+.filter-dropdown {
+  position: relative;
+  min-width: 185px;
+  flex: 1;
+  z-index: 20;
+}
+
+.filter-dropdown-trigger {
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-chip-border);
+  border-radius: 12px;
+  background: var(--color-chip-bg);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.filter-dropdown-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.filter-dropdown[open] .filter-dropdown-trigger {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(62, 114, 86, 0.09);
 }
 
 .filter-label {
-  min-width: 68px;
   color: #687167;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.filter-selected {
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.filter-chevron {
+  color: var(--green);
+  font-size: 16px;
+  line-height: 1;
+  transition: transform .18s ease;
+}
+
+.filter-dropdown[open] .filter-chevron {
+  transform: rotate(180deg);
 }
 
 .filter-options {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 100%;
+  width: max-content;
+  max-width: 280px;
+  z-index: 30;
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--color-chip-border);
+  border-radius: 12px;
+  background: var(--color-chip-bg);
+  box-shadow: 0 14px 30px rgba(45, 66, 51, 0.14);
   flex-wrap: wrap;
 }
 
 .filter-chip {
+  width: 100%;
   border: 1px solid var(--color-chip-border);
   background: var(--color-chip-bg);
   color: var(--color-text-primary);
-  border-radius: 16px;
-  padding: 9px 15px;
+  border-radius: 9px;
+  padding: 9px 12px;
   font-size: 12px;
+  text-align: left;
   transition: all .18s;
 }
 
@@ -566,9 +624,20 @@ textarea:focus-visible {
 
 .feed-filter-row {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 6px;
+  flex-wrap: nowrap;
+  align-items: center;
+  overflow: hidden;
+  padding-bottom: 0;
   margin-bottom: 20px;
+}
+
+.feed-filter-row .filter-chip {
+  width: auto;
+  flex: 1 1 auto;
+  padding: 7px 9px;
+  font-size: 11px;
+  white-space: nowrap;
 }
 
 .collections-page {
@@ -1128,10 +1197,17 @@ textarea:focus-visible {
   margin: 16px 0 0;
 }
 
+.auth-switch-hint span {
+  display: block;
+  margin-bottom: 2px;
+}
+
 .auth-inline-link {
   display: inline;
-  font-size: inherit;
-  text-decoration: underline;
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 700;
+  text-decoration: none;
 }
 
 /* Instagram Profile Layout (Forkful Theme) */
@@ -1486,27 +1562,15 @@ textarea:focus-visible {
   }
 
   .filters {
-    gap: 16px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
     margin: 22px 0 29px;
   }
 
-  .filter-group {
-    align-items: start;
-    gap: 8px;
-  }
-
-  .filter-label {
-    min-width: 70px;
-    padding-top: 9px;
-  }
-
-  .filter-options {
-    gap: 6px;
-    flex: 1;
-  }
-
-  .filter-chip {
-    padding: 8px 11px;
+  .filter-dropdown {
+    min-width: 0;
+    width: 100%;
   }
 
   .recipe-grid {

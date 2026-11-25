@@ -78,7 +78,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
         } else {
             const matched = users.find(u => u.email === cleanEmail && u.password === password);
             if (!matched) {
-                setError("Invalid email or password. Need an account? Sign up above.");
+                setError("Invalid email or password. Need an account? Sign up below.");
                 return;
             }
             onAuthSuccess({ id: matched.id, name: matched.name, email: matched.email, role: matched.role });
@@ -223,7 +223,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
                 </form>
 
                 <p className="recipe-author auth-switch-hint">
-                    {mode === "login" ? "New to Forkful? " : "Already have an account? "}
+                    <span>{mode === "login" ? "New to Forkful?" : "Already have an account?"}</span>
                     <button
                         type="button"
                         className="recipe-title auth-inline-link"

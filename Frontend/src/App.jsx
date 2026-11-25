@@ -85,10 +85,21 @@ function getInitials(name) {
 }
 
 function FilterGroup({ label, options, value, onChange }) {
+  const selectedOption = options.find((option) =>
+    typeof option === "string" ? option === value : option.value === value
+  );
+  const selectedLabel = typeof selectedOption === "string"
+    ? selectedOption
+    : selectedOption?.label;
+
   return (
-    <div className="filter-group">
-      <span className="filter-label">{label}</span>
-      <div className="filter-options">
+    <details className="filter-dropdown">
+      <summary className="filter-dropdown-trigger">
+        <span className="filter-label">{label}</span>
+        <span className="filter-selected">{selectedLabel}</span>
+        <span className="filter-chevron" aria-hidden="true">⌄</span>
+      </summary>
+      <div className="filter-options" role="menu">
         {options.map((option) => {
           const selected = typeof option === "string"
             ? value === option
@@ -98,16 +109,19 @@ function FilterGroup({ label, options, value, onChange }) {
             <button
               key={typeof option === "string" ? option : option.label}
               className={`filter-chip ${selected ? "selected" : ""}`}
-              onClick={() =>
-                onChange(typeof option === "string" ? option : option.value)
-              }
+              type="button"
+              role="menuitem"
+              onClick={(event) => {
+                onChange(typeof option === "string" ? option : option.value);
+                event.currentTarget.closest("details")?.removeAttribute("open");
+              }}
             >
               {typeof option === "string" ? option : option.label}
             </button>
           );
         })}
       </div>
-    </div>
+    </details>
   );
 }
 
