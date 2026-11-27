@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-forkful}
+      POSTGRES_USER: ${POSTGRES_USER:-forkful}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-forkful_dev_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - forkful-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-forkful} -d ${POSTGRES_DB:-forkful}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  forkful-postgres-data:

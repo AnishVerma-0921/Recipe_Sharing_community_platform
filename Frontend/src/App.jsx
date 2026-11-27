@@ -3,6 +3,12 @@ import "./App.css";
 import "./design.css";
 import AuthModal from "./AuthPage";
 import AdminPanel from "./AdminPanel.jsx";
+import {
+  loadCurrentUser,
+  loadRecipes,
+  logoutUser,
+  publishRecipe as saveRecipe,
+} from "./auth/credentials.js";
 
 const recipes = [
   { id: 1, title: "Smoky chickpea stew", author: "Meera P.", rating: 4.8, reviews: 212, time: 35, diet: "Vegan", cuisine: "Indian", color: "peach", tags: ["comfort", "stew"] },
@@ -57,8 +63,6 @@ const times = [
 const difficulties = ["All", "Easy", "Medium", "Hard"];
 const savedRecipesStorageKey = "forkful-saved-recipes";
 const shoppingListStorageKey = "forkful-shopping-list";
-const userRecipesStorageKey = "forkful-user-recipes";
-const currentUserStorageKey = "forkful-current-user";
 
 function recipeEmoji(cuisine) {
   return {
@@ -740,6 +744,7 @@ function PublishRecipe({ onBack, onPublish, currentUser }) {
   const [steps, setSteps] = useState([""]);
   const [cover, setCover] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   function updateIngredient(index, key, value) {
     setIngredients(old => old.map((item, i) =>
@@ -752,7 +757,7 @@ function PublishRecipe({ onBack, onPublish, currentUser }) {
       <button className="back-button" onClick={onBack}>← Back to Browse</button>
       <h1>Publish a recipe</h1>
 
-      <form className="publish-form" onSubmit={e => {
+      <form className="publish-form" onSubmit={async e => {
         e.preventDefault();
         setError("");
         const validIngredients = ingredients
@@ -778,7 +783,6 @@ function PublishRecipe({ onBack, onPublish, currentUser }) {
         }
 
         const recipe = {
-          id: `user-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
           title: title.trim(),
           author: currentUser?.name || "You",
           rating: 0,
@@ -795,11 +799,14 @@ function PublishRecipe({ onBack, onPublish, currentUser }) {
           cover,
         };
 
+        setSubmitting(true);
         try {
-          onPublish(recipe);
+          await onPublish(recipe);
         } catch (publishError) {
           console.error("Unable to publish recipe.", publishError);
-          setError("The recipe could not be saved in this browser. Check available storage and try again.");
+          setError(publishError.message || "The recipe could not be saved. Please try again.");
+        } finally {
+          setSubmitting(false);
         }
       }}>
         <section className="form-panel">
@@ -810,7 +817,7 @@ function PublishRecipe({ onBack, onPublish, currentUser }) {
           </label>
 
           <label className="field-label">Title
-            <input required value={title} onChange={e => setTitle(e.target.value)} placeholder="Name your dish" />
+            <input required maxLength={120} value={title} onChange={e => setTitle(e.target.value)} placeholder="Name your dish" />
           </label>
 
           <div className="form-grid">
@@ -866,7 +873,9 @@ function PublishRecipe({ onBack, onPublish, currentUser }) {
         </section>
 
         <div className="form-actions">
-          <button className="button button-orange" type="submit">Publish recipe</button>
+          <button className="button button-orange" type="submit" disabled={submitting}>
+            {submitting ? "Publishing..." : "Publish recipe"}
+          </button>
           <button className="button button-outline" type="button" onClick={onBack}>Cancel</button>
         </div>
         {error && <p className="publish-error" role="alert">{error}</p>}
@@ -883,49 +892,9 @@ export default function App() {
   const [difficulty, setDifficulty] = useState("All");
   const [visibleCount, setVisibleCount] = useState(8);
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState(() => {
-    try {
-      const stored = window.localStorage.getItem(currentUserStorageKey);
-      return stored ? JSON.parse(stored) : null;
-    } catch {
-      return null;
-    }
-  });
-  const [userRecipes, setUserRecipes] = useState(() => {
-    try {
-      const stored = window.localStorage.getItem(userRecipesStorageKey);
-      if (!stored) return [];
-
-      const storedRecipes = JSON.parse(stored);
-      if (!Array.isArray(storedRecipes)) {
-        throw new TypeError("Published recipes must be stored as an array.");
-      }
-
-      return storedRecipes.filter(recipe =>
-        recipe &&
-        typeof recipe.id === "string" &&
-        typeof recipe.title === "string" &&
-        typeof recipe.author === "string" &&
-        Number.isFinite(recipe.time) &&
-        typeof recipe.cuisine === "string" &&
-        typeof recipe.diet === "string" &&
-        Array.isArray(recipe.tags) &&
-        recipe.tags.every(tag => typeof tag === "string") &&
-        Array.isArray(recipe.ingredients) &&
-        recipe.ingredients.every(item =>
-          item &&
-          typeof item.name === "string" &&
-          typeof item.quantity === "string" &&
-          typeof item.unit === "string"
-        ) &&
-        Array.isArray(recipe.steps) &&
-        recipe.steps.every(step => typeof step === "string")
-      );
-    } catch (error) {
-      console.error("Unable to load published recipes from browser storage.", error);
-      return [];
-    }
-  });
+  const [currentUser, setCurrentUser] = useState(null);
+  const [userRecipes, setUserRecipes] = useState([]);
+  const [recipesError, setRecipesError] = useState("");
   const allRecipes = useMemo(() => [...recipes, ...userRecipes], [userRecipes]);
   const [saved, setSaved] = useState(() => {
     try {
@@ -937,9 +906,8 @@ export default function App() {
         throw new TypeError("Saved recipes must be stored as an array.");
       }
 
-      const recipeIds = new Set([...recipes, ...userRecipes].map(recipe => recipe.id));
       return [...new Set(storedIds.filter(id =>
-        (Number.isInteger(id) || typeof id === "string") && recipeIds.has(id)
+        Number.isInteger(id) || typeof id === "string"
       ))];
     } catch (error) {
       console.error("Unable to load saved recipes from browser storage.", error);
@@ -973,24 +941,27 @@ export default function App() {
   const [page, setPage] = useState("browse");
 
   useEffect(() => {
-    try {
-      if (currentUser) {
-        window.localStorage.setItem(currentUserStorageKey, JSON.stringify(currentUser));
-      } else {
-        window.localStorage.removeItem(currentUserStorageKey);
-      }
-    } catch (error) {
-      console.error("Unable to save user session to browser storage.", error);
-    }
-  }, [currentUser]);
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(userRecipesStorageKey, JSON.stringify(userRecipes));
-    } catch (error) {
-      console.error("Unable to save published recipes to browser storage.", error);
-    }
-  }, [userRecipes]);
+    let active = true;
+    loadCurrentUser()
+      .then(user => {
+        if (active) setCurrentUser(user);
+      })
+      .catch(error => {
+        if (active && error.status !== 401) {
+          console.error("Unable to restore the server session.", error);
+        }
+      });
+    loadRecipes()
+      .then(data => {
+        if (active) setUserRecipes(data);
+      })
+      .catch(error => {
+        if (active) setRecipesError(error.message);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     try {
@@ -1050,11 +1021,10 @@ export default function App() {
     ]);
   }
 
-  function publishRecipe(recipe) {
-    const updatedRecipes = [...userRecipes, recipe];
-    window.localStorage.setItem(userRecipesStorageKey, JSON.stringify(updatedRecipes));
-    setUserRecipes(updatedRecipes);
-    setSelectedRecipe(recipe);
+  async function publishRecipe(recipe) {
+    const savedRecipe = await saveRecipe(recipe);
+    setUserRecipes(old => [savedRecipe, ...old]);
+    setSelectedRecipe(savedRecipe);
     setPage("details");
     window.scrollTo(0, 0);
   }
@@ -1075,6 +1045,16 @@ export default function App() {
     setPage("profile");
     setSelectedRecipe(null);
     window.scrollTo(0, 0);
+  }
+
+  async function handleLogout() {
+    try {
+      await logoutUser();
+      setCurrentUser(null);
+      goBrowse();
+    } catch (error) {
+      window.alert(error.message);
+    }
   }
 
   return (
@@ -1099,7 +1079,14 @@ export default function App() {
               {currentUser.role === "admin" ? "ADMIN" : "USER"}
             </span>
           )}
-          <button className="button button-green publish-button" onClick={() => { setPage("publish"); window.scrollTo(0, 0); }}>Publish recipe</button>
+          <button className="button button-green publish-button" onClick={() => {
+            if (!currentUser) {
+              setAuthModalOpen(true);
+              return;
+            }
+            setPage("publish");
+            window.scrollTo(0, 0);
+          }}>Publish recipe</button>
           {currentUser ? (
             <button
               className="avatar"
@@ -1136,10 +1123,8 @@ export default function App() {
 
       {page === "admin" && currentUser?.role === "admin" ? (
         <AdminPanel
-          onLogout={() => {
-            setCurrentUser(null);
-            goBrowse();
-          }}
+          currentUser={currentUser}
+          onLogout={handleLogout}
         />
       ) : page === "profile" ? (
         <ProfilePage
@@ -1151,10 +1136,7 @@ export default function App() {
           onSave={toggleSaved}
           onSelectRecipe={openRecipe}
           onPublishClick={() => { setPage("publish"); window.scrollTo(0, 0); }}
-          onLogout={() => {
-            setCurrentUser(null);
-            goBrowse();
-          }}
+          onLogout={handleLogout}
           onOpenAuth={() => setAuthModalOpen(true)}
           onUpdateUser={updated => setCurrentUser(updated)}
         />
@@ -1191,6 +1173,7 @@ export default function App() {
       ) : (
         <main className="browse-page">
           <section className="welcome">
+            {recipesError && <p className="publish-error" role="alert">{recipesError}</p>}
             <h1>Cook something worth sharing.</h1>
             <p>Discover your next favourite dish, shared by home cooks like you.</p>
             <form className="search-form" onSubmit={e => e.preventDefault()}>

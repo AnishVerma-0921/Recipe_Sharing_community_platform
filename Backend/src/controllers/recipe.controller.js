@@ -8,52 +8,76 @@ import {
 } from "../models/recipe.model.js";
 
 // GET /api/recipes
-export function listRecipes(req, res) {
+export async function listRecipes(req, res, next) {
   const { category, search, page, limit } = req.query;
-  const result = getAllRecipes({ category, search, page, limit });
-  res.json({ success: true, ...result });
+  try {
+    const result = await getAllRecipes({ category, search, page, limit });
+    res.json({ success: true, ...result });
+  } catch (error) {
+    next(error);
+  }
 }
 
 // GET /api/recipes/categories
-export function listCategories(_req, res) {
-  res.json({ success: true, data: getCategories() });
+export async function listCategories(_req, res, next) {
+  try {
+    res.json({ success: true, data: await getCategories() });
+  } catch (error) {
+    next(error);
+  }
 }
 
 // GET /api/recipes/:id
-export function getRecipe(req, res, next) {
-  const recipe = getRecipeById(req.params.id);
-  if (!recipe) {
-    const err = new Error(`Recipe not found: ${req.params.id}`);
-    err.statusCode = 404;
-    return next(err);
+export async function getRecipe(req, res, next) {
+  try {
+    const recipe = await getRecipeById(req.params.id);
+    if (!recipe) {
+      const err = new Error(`Recipe not found: ${req.params.id}`);
+      err.statusCode = 404;
+      return next(err);
+    }
+    res.json({ success: true, data: recipe });
+  } catch (error) {
+    next(error);
   }
-  res.json({ success: true, data: recipe });
 }
 
 // POST /api/recipes
-export function addRecipe(req, res) {
-  const recipe = createRecipe(req.body);
-  res.status(201).json({ success: true, data: recipe });
+export async function addRecipe(req, res, next) {
+  try {
+    const recipe = await createRecipe(req.body, req.user);
+    res.status(201).json({ success: true, data: recipe });
+  } catch (error) {
+    next(error);
+  }
 }
 
 // PATCH /api/recipes/:id
-export function editRecipe(req, res, next) {
-  const recipe = updateRecipe(req.params.id, req.body);
-  if (!recipe) {
-    const err = new Error(`Recipe not found: ${req.params.id}`);
-    err.statusCode = 404;
-    return next(err);
+export async function editRecipe(req, res, next) {
+  try {
+    const recipe = await updateRecipe(req.params.id, req.body, req.user);
+    if (!recipe) {
+      const err = new Error(`Recipe not found or you do not own it: ${req.params.id}`);
+      err.statusCode = 404;
+      return next(err);
+    }
+    res.json({ success: true, data: recipe });
+  } catch (error) {
+    next(error);
   }
-  res.json({ success: true, data: recipe });
 }
 
 // DELETE /api/recipes/:id
-export function removeRecipe(req, res, next) {
-  const deleted = deleteRecipe(req.params.id);
-  if (!deleted) {
-    const err = new Error(`Recipe not found: ${req.params.id}`);
-    err.statusCode = 404;
-    return next(err);
+export async function removeRecipe(req, res, next) {
+  try {
+    const deleted = await deleteRecipe(req.params.id, req.user);
+    if (!deleted) {
+      const err = new Error(`Recipe not found or you do not own it: ${req.params.id}`);
+      err.statusCode = 404;
+      return next(err);
+    }
+    res.status(204).send();
+  } catch (error) {
+    next(error);
   }
-  res.status(204).send();
 }

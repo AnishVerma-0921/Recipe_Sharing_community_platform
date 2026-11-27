@@ -13,6 +13,7 @@ import {
   listQueryRules,
   validate,
 } from "../validators/recipe.validator.js";
+import { requireAuth } from "../middleware/auth.js";
 
 const router = Router();
 
@@ -21,7 +22,7 @@ const router = Router();
 router
   .route("/")
   .get(listQueryRules, validate, listRecipes)
-  .post(recipeCreateRules, validate, addRecipe);
+  .post(requireAuth, recipeCreateRules, validate, addRecipe);
 
 // GET  /api/recipes/categories   — distinct category list (must be before /:id)
 router.get("/categories", listCategories);
@@ -32,7 +33,7 @@ router.get("/categories", listCategories);
 router
   .route("/:id")
   .get(getRecipe)
-  .patch(recipeUpdateRules, validate, editRecipe)
-  .delete(removeRecipe);
+  .patch(requireAuth, recipeUpdateRules, validate, editRecipe)
+  .delete(requireAuth, removeRecipe);
 
 export default router;

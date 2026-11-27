@@ -1,70 +1,71 @@
-/**
- * In-memory Recipe store.
- * Swap `db` for a real database (MongoDB, PostgreSQL, …) without touching
- * the controllers — just replace these functions with async DB calls.
- */
+import { randomUUID } from "node:crypto";
+import { pool } from "../db/database.js";
 
-import { v4 as uuidv4 } from "uuid";
+const recipeColumns = `
+  id, title, description, ingredients, steps, cuisine, diet, difficulty, time,
+  servings, rating, reviews, tags, cover, color, author, owner_user_id, created_at, updated_at
+`;
 
-// Seed data so the API returns something useful out-of-the-box
-let db = [
-  {
-    id: uuidv4(),
-    title: "Classic Margherita Pizza",
-    description: "Simple Neapolitan pizza with fresh tomato, mozzarella, and basil.",
-    ingredients: ["pizza dough", "tomato sauce", "fresh mozzarella", "basil", "olive oil"],
-    steps: [
-      "Preheat oven to 250 °C.",
-      "Stretch dough on a floured surface.",
-      "Spread tomato sauce, add mozzarella.",
-      "Bake 10-12 min until crust is golden.",
-      "Top with fresh basil and a drizzle of olive oil.",
-    ],
-    category: "Italian",
-    prepTimeMinutes: 15,
-    cookTimeMinutes: 12,
-    servings: 4,
-    author: "admin",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function findById(id) {
-  return db.find((r) => r.id === id) ?? null;
+function mapRecipe(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    ingredients: row.ingredients,
+    steps: row.steps,
+    cuisine: row.cuisine,
+    diet: row.diet,
+    difficulty: row.difficulty,
+    time: row.time,
+    servings: row.servings,
+    rating: Number(row.rating),
+    reviews: row.reviews,
+    tags: row.tags,
+    cover: row.cover,
+    color: row.color,
+    author: row.author,
+    createdAt: row.created_at.toISOString(),
+    updatedAt: row.updated_at.toISOString(),
+  };
 }
 
-// ── CRUD ─────────────────────────────────────────────────────────────────────
-
-export function getAllRecipes({ category, search, page = 1, limit = 10 } = {}) {
-  let results = [...db];
+export async function getAllRecipes({ category, search, page = 1, limit = 10 } = {}) {
+  const filters = [];
+  const values = [];
 
   if (category) {
-    results = results.filter(
-      (r) => r.category.toLowerCase() === category.toLowerCase()
-    );
+    values.push(category);
+    filters.push(`LOWER(cuisine) = LOWER($${values.length})`);
   }
-
   if (search) {
-    const q = search.toLowerCase();
-    results = results.filter(
-      (r) =>
-        r.title.toLowerCase().includes(q) ||
-        r.description.toLowerCase().includes(q)
-    );
+    values.push(`%${search}%`);
+    const searchParam = `$${values.length}`;
+    filters.push(`(
+      title ILIKE ${searchParam}
+      OR description ILIKE ${searchParam}
+      OR ingredients::text ILIKE ${searchParam}
+      OR array_to_string(tags, ' ') ILIKE ${searchParam}
+    )`);
   }
 
-  // Pagination
-  const total = results.length;
-  const pageNum = Math.max(1, parseInt(page, 10));
-  const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10)));
-  const start = (pageNum - 1) * limitNum;
-  const data = results.slice(start, start + limitNum);
+  const where = filters.length ? `WHERE ${filters.join(" AND ")}` : "";
+  const countResult = await pool.query(
+    `SELECT COUNT(*)::integer AS total FROM recipes ${where}`,
+    values
+  );
+  const total = countResult.rows[0].total;
+  const pageNum = Math.max(1, Number.parseInt(page, 10) || 1);
+  const limitNum = Math.min(50, Math.max(1, Number.parseInt(limit, 10) || 10));
+  const offset = (pageNum - 1) * limitNum;
+  const { rows } = await pool.query(
+    `SELECT ${recipeColumns} FROM recipes ${where}
+     ORDER BY created_at DESC LIMIT $${values.length + 1} OFFSET $${values.length + 2}`,
+    [...values, limitNum, offset]
+  );
 
   return {
-    data,
+    data: rows.map(mapRecipe),
     meta: {
       total,
       page: pageNum,
@@ -74,42 +75,99 @@ export function getAllRecipes({ category, search, page = 1, limit = 10 } = {}) {
   };
 }
 
-export function getRecipeById(id) {
-  return findById(id);
+export async function getRecipeById(id) {
+  const { rows } = await pool.query(
+    `SELECT ${recipeColumns} FROM recipes WHERE id = $1`,
+    [id]
+  );
+  return mapRecipe(rows[0]);
 }
 
-export function createRecipe(payload) {
-  const now = new Date().toISOString();
-  const recipe = {
-    id: uuidv4(),
-    ...payload,
-    createdAt: now,
-    updatedAt: now,
+export async function createRecipe(payload, user) {
+  const { rows } = await pool.query(
+    `INSERT INTO recipes (
+       id, title, description, ingredients, steps, cuisine, diet, difficulty,
+       time, servings, tags, cover, color, author, owner_user_id
+     )
+     VALUES ($1, $2, $3, $4::jsonb, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+     RETURNING ${recipeColumns}`,
+    [
+      randomUUID(),
+      payload.title,
+      payload.description || "",
+      JSON.stringify(payload.ingredients),
+      payload.steps,
+      payload.cuisine,
+      payload.diet || "",
+      payload.difficulty || "Easy",
+      payload.time,
+      payload.servings,
+      payload.tags || [],
+      payload.cover || "",
+      payload.color || "sage",
+      user.name,
+      user.id,
+    ]
+  );
+  return mapRecipe(rows[0]);
+}
+
+export async function updateRecipe(id, payload, user) {
+  const fields = {
+    title: "title",
+    description: "description",
+    ingredients: "ingredients",
+    steps: "steps",
+    cuisine: "cuisine",
+    diet: "diet",
+    difficulty: "difficulty",
+    time: "time",
+    servings: "servings",
+    tags: "tags",
+    cover: "cover",
+    color: "color",
   };
-  db.push(recipe);
-  return recipe;
+  const updates = Object.entries(fields).filter(([field]) =>
+    Object.hasOwn(payload, field)
+  );
+  if (updates.length === 0) {
+    const { rows } = await pool.query(
+      `SELECT ${recipeColumns} FROM recipes
+       WHERE id = $1 AND (owner_user_id = $2 OR $3 = 'admin')`,
+      [id, user.id, user.role]
+    );
+    return mapRecipe(rows[0]);
+  }
+
+  const values = updates.map(([field]) =>
+    field === "ingredients" ? JSON.stringify(payload[field]) : payload[field]
+  );
+  const assignments = updates.map(([field], index) =>
+    `${fields[field]} = $${index + 1}${field === "ingredients" ? "::jsonb" : ""}`
+  );
+  values.push(id, user.id, user.role);
+  const { rows } = await pool.query(
+    `UPDATE recipes SET ${assignments.join(", ")}, updated_at = NOW()
+     WHERE id = $${values.length - 2}
+       AND (owner_user_id = $${values.length - 1} OR $${values.length} = 'admin')
+     RETURNING ${recipeColumns}`,
+    values
+  );
+  return mapRecipe(rows[0]);
 }
 
-export function updateRecipe(id, payload) {
-  const idx = db.findIndex((r) => r.id === id);
-  if (idx === -1) return null;
-
-  db[idx] = {
-    ...db[idx],
-    ...payload,
-    id,                               // prevent id override
-    updatedAt: new Date().toISOString(),
-  };
-  return db[idx];
+export async function deleteRecipe(id, user) {
+  const { rowCount } = await pool.query(
+    `DELETE FROM recipes
+     WHERE id = $1 AND (owner_user_id = $2 OR $3 = 'admin')`,
+    [id, user.id, user.role]
+  );
+  return rowCount > 0;
 }
 
-export function deleteRecipe(id) {
-  const idx = db.findIndex((r) => r.id === id);
-  if (idx === -1) return false;
-  db.splice(idx, 1);
-  return true;
-}
-
-export function getCategories() {
-  return [...new Set(db.map((r) => r.category))];
+export async function getCategories() {
+  const { rows } = await pool.query(
+    "SELECT DISTINCT cuisine FROM recipes ORDER BY cuisine"
+  );
+  return rows.map(({ cuisine }) => cuisine);
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { loadUsers, addUser } from "./auth/credentials.js";
+import { loginUser, registerUser } from "./auth/credentials.js";
 
 export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
     const [mode, setMode] = useState("login"); // "login" | "signup"
@@ -7,9 +7,8 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [role, setRole] = useState("user"); // "user" or "admin"
-
     const [error, setError] = useState("");
+    const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -31,10 +30,9 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
         setEmail("");
     }
 
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault();
         setError("");
-
         const cleanEmail = email.trim().toLowerCase();
         const cleanName = name.trim();
 
@@ -43,45 +41,29 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
             return;
         }
 
-        // Load existing users via helper (ensures admin exists)
-        const users = loadUsers();
+        if (mode === "signup" && !cleanName) {
+            setError("Enter a display name for your chef profile.");
+            return;
+        }
+        if (mode === "signup" && password.length < 8) {
+            setError("Choose a password with at least 8 characters.");
+            return;
+        }
+        if (mode === "signup" && password !== confirmPassword) {
+            setError("Your passwords do not match.");
+            return;
+        }
 
-        if (mode === "signup") {
-            if (!cleanName) {
-                setError("Enter a display name for your chef profile.");
-                return;
-            }
-            if (password.length < 6) {
-                setError("Choose a password with at least 6 characters.");
-                return;
-            }
-            if (password !== confirmPassword) {
-                setError("Your passwords do not match.");
-                return;
-            }
-            if (users.some(u => u.email === cleanEmail)) {
-                setError("An account with this email already exists. Try logging in.");
-                return;
-            }
-
-            const newUser = {
-                id: `user-${Date.now()}`,
-                name: cleanName,
-                email: cleanEmail,
-                password,
-                role,
-            };
-
-            // Use helper to add (will also ensure admin exists)
-            addUser(newUser);
-            onAuthSuccess({ id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role });
-        } else {
-            const matched = users.find(u => u.email === cleanEmail && u.password === password);
-            if (!matched) {
-                setError("Invalid email or password. Need an account? Sign up below.");
-                return;
-            }
-            onAuthSuccess({ id: matched.id, name: matched.name, email: matched.email, role: matched.role });
+        setSubmitting(true);
+        try {
+            const user = mode === "signup"
+                ? await registerUser({ name: cleanName, email: cleanEmail, password })
+                : await loginUser({ email: cleanEmail, password });
+            onAuthSuccess(user);
+        } catch (authError) {
+            setError(authError.message || "Unable to authenticate. Please try again.");
+        } finally {
+            setSubmitting(false);
         }
     }
 
@@ -151,28 +133,6 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
                         </label>
                     )}
 
-                    {mode === "signup" && (
-                        <label className="field-label">
-                            Account Type
-                            <select
-                                value={role}
-                                onChange={e => setRole(e.target.value)}
-                                style={{
-                                    height: "44px",
-                                    padding: "0 12px",
-                                    borderRadius: "8px",
-                                    border: "1px solid var(--color-border)",
-                                    background: "var(--color-bg-card)",
-                                    fontSize: "14px",
-                                    marginTop: "4px"
-                                }}
-                            >
-                                <option value="user">User (Standard Cook)</option>
-                                <option value="admin">Admin (Platform Manager)</option>
-                            </select>
-                        </label>
-                    )}
-
                     <label className="field-label">
                         Email address
                         <input
@@ -188,7 +148,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
                         Password
                         <input
                             type="password"
-                            placeholder="••••••••"
+                            placeholder="At least 8 characters"
                             value={password}
                             onChange={e => setPassword(e.target.value)}
                         />
@@ -213,8 +173,8 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
                     )}
 
                     <div className="form-actions">
-                        <button className="button button-green" type="submit">
-                            {mode === "login" ? "Log in" : "Create account"}
+                        <button className="button button-green" type="submit" disabled={submitting}>
+                            {submitting ? "Please wait..." : mode === "login" ? "Log in" : "Create account"}
                         </button>
                         <button className="button button-outline" type="button" onClick={onClose}>
                             Cancel

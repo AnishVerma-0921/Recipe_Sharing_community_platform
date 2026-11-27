@@ -9,15 +9,15 @@ export const recipeCreateRules = [
     .isLength({ max: 120 }).withMessage("title must be ≤ 120 characters"),
 
   body("description")
+    .optional()
     .trim()
-    .notEmpty().withMessage("description is required")
     .isLength({ max: 1000 }).withMessage("description must be ≤ 1000 characters"),
 
   body("ingredients")
     .isArray({ min: 1 }).withMessage("ingredients must be a non-empty array"),
-  body("ingredients.*")
+  body("ingredients.*.name")
     .trim()
-    .notEmpty().withMessage("each ingredient must be a non-empty string"),
+    .notEmpty().withMessage("each ingredient must have a name"),
 
   body("steps")
     .isArray({ min: 1 }).withMessage("steps must be a non-empty array"),
@@ -25,22 +25,22 @@ export const recipeCreateRules = [
     .trim()
     .notEmpty().withMessage("each step must be a non-empty string"),
 
-  body("category")
+  body("cuisine")
     .trim()
-    .notEmpty().withMessage("category is required"),
+    .notEmpty().withMessage("cuisine is required"),
 
-  body("prepTimeMinutes")
-    .isInt({ min: 0 }).withMessage("prepTimeMinutes must be a non-negative integer"),
-
-  body("cookTimeMinutes")
-    .isInt({ min: 0 }).withMessage("cookTimeMinutes must be a non-negative integer"),
+  body("time")
+    .isInt({ min: 0 }).withMessage("time must be a non-negative integer"),
 
   body("servings")
     .isInt({ min: 1 }).withMessage("servings must be a positive integer"),
 
-  body("author")
-    .trim()
-    .notEmpty().withMessage("author is required"),
+  body("diet").optional().isString().isLength({ max: 40 }),
+  body("difficulty").optional().isString().isLength({ max: 20 }),
+  body("tags").optional().isArray(),
+  body("tags.*").optional().isString().trim().notEmpty(),
+  body("cover").optional().isString(),
+  body("color").optional().isString().isLength({ max: 20 }),
 ];
 
 export const recipeUpdateRules = [
@@ -64,19 +64,21 @@ export const recipeUpdateRules = [
     .optional()
     .isArray({ min: 1 }).withMessage("steps must be a non-empty array"),
 
-  body("category").optional().trim().notEmpty(),
+  body("cuisine").optional().trim().notEmpty(),
 
-  body("prepTimeMinutes")
+  body("time")
     .optional()
-    .isInt({ min: 0 }).withMessage("prepTimeMinutes must be a non-negative integer"),
-
-  body("cookTimeMinutes")
-    .optional()
-    .isInt({ min: 0 }).withMessage("cookTimeMinutes must be a non-negative integer"),
+    .isInt({ min: 0 }).withMessage("time must be a non-negative integer"),
 
   body("servings")
     .optional()
     .isInt({ min: 1 }).withMessage("servings must be a positive integer"),
+  body("diet").optional().isString().isLength({ max: 40 }),
+  body("difficulty").optional().isString().isLength({ max: 20 }),
+  body("tags").optional().isArray(),
+  body("tags.*").optional().isString().trim().notEmpty(),
+  body("cover").optional().isString(),
+  body("color").optional().isString().isLength({ max: 20 }),
 ];
 
 export const listQueryRules = [

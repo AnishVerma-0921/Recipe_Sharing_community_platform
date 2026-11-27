@@ -466,3 +466,478 @@ body, :root {
   background: #e74c3c;
   color: #ffffff;
 }
+
+/* Forkful admin profile layout */
+.forkful-admin-page {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 218px minmax(0, 1fr);
+  gap: 28px;
+  padding: 28px 30px 70px;
+  color: #243126;
+}
+
+.forkful-admin-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.admin-profile-card,
+.admin-cuisine-card {
+  background: #fff;
+  border: 1px solid #ddd6c7;
+  border-radius: 9px;
+  box-shadow: 0 2px 8px rgba(42, 59, 45, 0.06);
+  overflow: hidden;
+}
+
+.admin-profile-cover {
+  height: 68px;
+  position: relative;
+  background: linear-gradient(180deg, #2f7a52 0 50%, #244735 50%);
+}
+
+.admin-profile-avatar {
+  position: absolute;
+  left: 20px;
+  bottom: -39px;
+  width: 74px;
+  height: 74px;
+  display: grid;
+  place-items: center;
+  border: 5px solid #fff;
+  border-radius: 50%;
+  background: #d67b1f;
+  color: #fff;
+  font-size: 34px;
+  font-weight: 800;
+  box-shadow: 0 2px 5px rgba(43, 54, 46, 0.12);
+}
+
+.admin-profile-body {
+  padding: 48px 20px 16px;
+}
+
+.admin-profile-body h2 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.1;
+  color: #1d2a20;
+}
+
+.admin-profile-email {
+  margin: 4px 0 10px;
+  color: #6d776f;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.admin-profile-bio {
+  margin: 0 0 14px;
+  color: #3d4a40;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.admin-profile-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 15px;
+  border: 1px solid #eeeae1;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.admin-profile-stats div {
+  min-width: 0;
+  padding: 9px 3px 7px;
+  text-align: center;
+  border-right: 1px solid #eeeae1;
+}
+
+.admin-profile-stats div:last-child {
+  border-right: 0;
+}
+
+.admin-profile-stats strong,
+.admin-profile-stats span {
+  display: block;
+}
+
+.admin-profile-stats strong {
+  font-size: 13px;
+  color: #27352b;
+}
+
+.admin-profile-stats span {
+  margin-top: 2px;
+  color: #777f79;
+  font-size: 9px;
+}
+
+.admin-publish-button {
+  width: 100%;
+  height: 36px;
+  border: 0;
+  border-radius: 6px;
+  background: #24724b;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.admin-profile-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+.admin-profile-actions button {
+  height: 32px;
+  border: 1px solid #aebfb1;
+  border-radius: 5px;
+  background: #fff;
+  color: #315940;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.admin-cuisine-card {
+  padding: 16px 18px 18px;
+}
+
+.admin-cuisine-card h3 {
+  margin: 0 0 13px;
+  font-size: 12px;
+  color: #343e36;
+}
+
+.admin-cuisine-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px 6px;
+}
+
+.admin-cuisine-item {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  border: 0;
+  background: transparent;
+  color: #404943;
+  font-size: 10px;
+}
+
+.admin-cuisine-item span {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e5e1d7;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 17px;
+  box-shadow: 0 2px 5px rgba(50, 65, 52, 0.06);
+}
+
+.forkful-admin-content {
+  min-width: 0;
+}
+
+.admin-recipe-tabs {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 32px;
+  border-bottom: 1px solid #ddd8cd;
+}
+
+.admin-recipe-tabs button {
+  height: 32px;
+  padding: 0 1px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #5a665f;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.admin-recipe-tabs button.active {
+  border-bottom-color: #2e7a51;
+  color: #2c7250;
+}
+
+.admin-content-heading {
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-content-heading h1 {
+  margin: 0;
+  color: #26342a;
+  font-size: 15px;
+}
+
+.admin-content-heading span {
+  color: #647067;
+  font-size: 11px;
+}
+
+.admin-recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-recipe-card {
+  min-width: 0;
+  height: 248px;
+  border: 1px solid #dfddd5;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 2px 7px rgba(54, 70, 58, 0.05);
+}
+
+.admin-recipe-cover {
+  height: 137px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.admin-cover-blue {
+  background: linear-gradient(145deg, #2c6b95 0%, #317ca0 65%, #2c6c98 100%);
+}
+
+.admin-cover-yellow {
+  background: linear-gradient(145deg, #eee5d4 0%, #dfe0d4 100%);
+}
+
+.plate-art {
+  width: 92px;
+  height: 92px;
+  display: grid;
+  place-items: center;
+  border: 12px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 6px 10px rgba(35, 47, 40, 0.24);
+}
+
+.plate-art span {
+  width: 58px;
+  height: 58px;
+  display: block;
+  border-radius: 50%;
+  background: #ad412f;
+}
+
+.plate-art-yellow {
+  border-color: #fdfdfb;
+}
+
+.plate-art-yellow span {
+  background: #eedf88;
+}
+
+.admin-save-button {
+  position: absolute;
+  right: 9px;
+  top: 9px;
+  z-index: 2;
+  width: 25px;
+  height: 25px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: #bd4b3a;
+  font-size: 12px;
+  box-shadow: 0 2px 5px rgba(35, 47, 40, 0.18);
+}
+
+.admin-recipe-body {
+  height: 111px;
+  padding: 10px 11px;
+}
+
+.admin-recipe-body h3 {
+  margin: 0 0 4px;
+  color: #2b372e;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.admin-recipe-body p {
+  margin: 0;
+  color: #6c756e;
+  font-size: 10px;
+}
+
+.admin-recipe-body p span {
+  color: #b28c52;
+  margin-left: 3px;
+}
+
+.admin-recipe-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 13px;
+  color: #69736c;
+  font-size: 9px;
+}
+
+.admin-recipe-meta strong {
+  height: 24px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 6px;
+  border-radius: 12px;
+  background: #f5ede2;
+  color: #b54a32;
+  font-size: 9px;
+}
+
+.admin-recipe-meta strong small {
+  font-size: 8px;
+  font-weight: 650;
+}
+
+.admin-recipe-meta em {
+  margin-left: auto;
+  padding: 4px 7px;
+  border-radius: 4px;
+  background: #e8f0e6;
+  color: #39704e;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.admin-find-card {
+  height: 248px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px dashed #b8c9b9;
+  border-radius: 8px;
+  background: transparent;
+  color: #69756d;
+  font-size: 10px;
+}
+
+.admin-find-card strong {
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0 16px;
+  border: 1px solid #4d7b5e;
+  border-radius: 5px;
+  color: #376b4d;
+  background: #fff;
+  font-size: 10px;
+}
+
+.admin-empty-state {
+  height: 220px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  border: 1px dashed #d8d3c7;
+  border-radius: 8px;
+  color: #707970;
+}
+
+.admin-empty-state span {
+  font-size: 34px;
+}
+
+.admin-empty-state h2 {
+  font-size: 14px;
+}
+
+.admin-users-details {
+  margin-top: 18px;
+  border: 1px solid #ddd8cd;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 12px;
+}
+
+.admin-users-details summary {
+  padding: 12px 14px;
+  cursor: pointer;
+  font-weight: 750;
+}
+
+.admin-users-list {
+  border-top: 1px solid #eeeae1;
+}
+
+.admin-users-list div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  border-bottom: 1px solid #f2efe8;
+}
+
+.admin-users-list span,
+.admin-users-list strong,
+.admin-users-list small {
+  display: block;
+}
+
+.admin-users-list small {
+  color: #7b837d;
+  margin-top: 2px;
+}
+
+.admin-users-list em {
+  color: #888;
+  font-size: 10px;
+  font-style: normal;
+}
+
+.admin-users-list button {
+  border: 1px solid #d77768;
+  border-radius: 5px;
+  background: #fff;
+  color: #b94e3e;
+  padding: 5px 9px;
+}
+
+@media (max-width: 760px) {
+  .forkful-admin-page {
+    grid-template-columns: 1fr;
+    padding: 18px 16px 50px;
+  }
+
+  .forkful-admin-sidebar {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .admin-recipe-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-recipe-grid {
+    grid-template-columns: 1fr;
+  }
+}
